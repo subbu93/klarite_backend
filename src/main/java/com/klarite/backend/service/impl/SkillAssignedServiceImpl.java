@@ -1,10 +1,7 @@
 package com.klarite.backend.service.impl;
 
 import com.klarite.backend.dto.SkillAssignment;
-import com.klarite.backend.dto.SkillEpisodes;
 import com.klarite.backend.service.SkillAssignedService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +14,11 @@ import java.util.Map;
 public class SkillAssignedServiceImpl implements SkillAssignedService {
 
     @Override
-    public List<SkillAssignment> getAllAssignedSkills(long id, JdbcTemplate jdbcTemplate) {
+    public List<SkillAssignment> getAllAssignedSkills(long userId, JdbcTemplate jdbcTemplate) {
         String query = "SELECT t2.assignment_name   AS assignment_name, " +
                 "       t2.completion_date  AS completion_date, " +
                 "       t2.user_id, " +
+                "       t2.skill_id as skill_id, "+
                 "       t2.cost_center_name AS cost_center_name, " +
                 "       skills.NAME         AS skills_name " +
                 "FROM   (SELECT t1.assignment_name  AS assignment_name, " +
@@ -40,7 +38,7 @@ public class SkillAssignedServiceImpl implements SkillAssignedService {
                 "                 ON t1.cost_center_id = cc.id) AS t2 " +
                 "       INNER JOIN skills " +
                 "               ON t2.skill_id = skills.id " +
-                "WHERE  t2.user_id = " + id;
+                "WHERE  t2.user_id = " + userId;
 
         List<SkillAssignment> skillAssignments = new ArrayList<>();
 
@@ -53,29 +51,20 @@ public class SkillAssignedServiceImpl implements SkillAssignedService {
             obj.setName((String) row.get("skills_name"));
             obj.setCostCenterName((String) row.get("cost_center_name"));
             obj.setCompletionDate((Date) row.get("completion_date"));
+            obj.setEpisodeCount(getEpisodeCount((Long) row.get("skill_id"), userId, jdbcTemplate));
+
             skillAssignments.add(obj);
         }
         return skillAssignments;
     }
 
-    @Override
-    public ResponseEntity<Object> addSkillEpisodes(SkillEpisodes skillEpisodes, JdbcTemplate jdbcTemplate) {
-        String query = "INSERT INTO skill_episodes " +
-                "VALUES      (?," +
-                "             ?, " +
-                "             ?, " +
-                "             ?, " +
-                "             ?," +
-                "             ?," +
-                "             ?); ";
+    Integer getEpisodeCount(long skillId, long userId, JdbcTemplate jdbcTemplate ) {
+        String query = "SELECT Count(*) AS count " +
+                "FROM   skill_episodes " +
+                "WHERE  user_id = ? " +
+                "       AND skill_id = ? ";
 
-        try{
-            jdbcTemplate.update(query,skillEpisodes.getSkillId(),skillEpisodes.getUserId(),
-                    skillEpisodes.getDate(), skillEpisodes.getMrn(), skillEpisodes.isObserved(),
-                    skillEpisodes.getObserverId(), skillEpisodes.isAudited());
-            return new ResponseEntity<>("Stored", HttpStatus.CREATED);
-        } catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
-        }
+        Map<String, Object> row = jdbcTemplate.queryForMap(query, userId, skillId);
+        return (Integer) row.get("count");
     }
 }

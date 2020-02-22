@@ -3,11 +3,9 @@ package com.klarite.backend.controller;
 import com.klarite.backend.dto.Skill;
 import com.klarite.backend.service.AdminSkillService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -27,5 +25,15 @@ public class AdminSkillController {
     @GetMapping("/skill_admin/get_skill")
     public Skill getSkill(@RequestParam(value = "id") long id){
         return adminSkillService.getSkill(id, jdbcTemplate);
+    }
+
+    @PostMapping("/skill_admin/add_skill")
+    public ResponseEntity<Object> addSkill(@RequestBody Skill skill) {
+        return adminSkillService.addSkill(skill, jdbcTemplate);
+    }
+
+    @DeleteMapping("/skill_admin/delete_skill")
+    public ResponseEntity<Object> deleteSkill(@RequestParam(value = "id") long id) {
+        return adminSkillService.deleteSkill(id, jdbcTemplate);
     }
 }

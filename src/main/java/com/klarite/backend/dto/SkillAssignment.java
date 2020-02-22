@@ -8,6 +8,7 @@ public class SkillAssignment {
     private String AssignedSkill;
     private String SkillValidatedBy;
     private Date CompletionDate;
+    private Integer episodeCount;
 
     public String getName() {
         return name;
@@ -47,5 +48,13 @@ public class SkillAssignment {
 
     public void setCompletionDate(Date completionDate) {
         CompletionDate = completionDate;
+    }
+
+    public Integer getEpisodeCount() {
+        return episodeCount;
+    }
+
+    public void setEpisodeCount(Integer episodeCount) {
+        this.episodeCount = episodeCount;
     }
 }

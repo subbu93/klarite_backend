@@ -9,7 +9,7 @@ public class SkillEpisodes {
     private Date date;
     private String mrn;
     private boolean isObserved;
-    private int observerId;
+    private Integer observerId = null;
     private boolean isAudited;
 
     public long getId() {
@@ -60,11 +60,11 @@ public class SkillEpisodes {
         isObserved = observed;
     }
 
-    public int getObserverId() {
+    public Integer getObserverId() {
         return observerId;
     }
 
-    public void setObserverId(int observerId) {
+    public void setObserverId(Integer observerId) {
         this.observerId = observerId;
     }
 

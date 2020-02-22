@@ -25,9 +25,4 @@ public class SkillAssignedController {
         return skillAssignedService.getAllAssignedSkills(id, jdbcTemplate);
     }
 
-    @PostMapping("/assign_skill/add_episode")
-    public ResponseEntity<Object> addEpisodes(@RequestBody SkillEpisodes skillEpisodes) {
-        return skillAssignedService.addSkillEpisodes(skillEpisodes, jdbcTemplate);
-    }
-
 }

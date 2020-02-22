@@ -5,7 +5,7 @@ public class Skill {
     private String name;
     private String description;
     private Integer threshold;
-    private String skillPreRequisite;
+    private String skillTrainingPreRequisite;
 
     public long getId() {
         return id;
@@ -39,11 +39,11 @@ public class Skill {
         this.threshold = threshold;
     }
 
-    public String getSkillPreRequisite() {
-        return skillPreRequisite;
+    public String getSkillTrainingPreRequisite() {
+        return skillTrainingPreRequisite;
     }
 
-    public void setSkillPreRequisite(String skillPreRequisite) {
-        this.skillPreRequisite = skillPreRequisite;
+    public void setSkillTrainingPreRequisite(String skillTrainingPreRequisite) {
+        this.skillTrainingPreRequisite = skillTrainingPreRequisite;
     }
 }
