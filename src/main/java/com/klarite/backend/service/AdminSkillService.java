@@ -24,4 +24,8 @@ public interface AdminSkillService {
     Training getTraining(long trainingId, JdbcTemplate jdbcTemplate);
 
     List<User> getTrainer(JdbcTemplate jdbcTemplate);
+
+    ResponseEntity<Object> addTraining(Training training, JdbcTemplate jdbcTemplate);
+
+    ResponseEntity<Object> deleteTraining(long trainingId, JdbcTemplate jdbcTemplate);
 }

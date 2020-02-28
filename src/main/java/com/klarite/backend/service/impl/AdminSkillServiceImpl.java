@@ -213,4 +213,53 @@ public class AdminSkillServiceImpl implements AdminSkillService {
 
         return users;
     }
+
+    @Override
+    public ResponseEntity<Object> addTraining(Training training, JdbcTemplate jdbcTemplate) {
+        String query = "";
+        if (training.getId() == null) {
+            query = "INSERT INTO " + Constants.TABLE_TRAININGS +
+                    " (name, description, is_ce, ce_id, trainer_id, total_hours, soft_delete) " +
+                    " VALUES      (?," +
+                    "             ?, " +
+                    "             ?," +
+                    "             ?," +
+                    "             ?," +
+                    "             ?," +
+                    "             0); ";
+            try {
+                jdbcTemplate.update(query, training.getTrainingName(), training.getDescription(), training.isCE(),
+                        training.getCeId(), training.getTrainerId(), training.getTotalHours());
+                ResponseEntity<Object> response = new ResponseEntity<>("Stored", HttpStatus.CREATED);
+                return response;
+            } catch (Exception e) {
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            query = "UPDATE " + Constants.TABLE_TRAININGS +
+                    " SET name = ?, description= ?, is_ce = ?, ce_id = ?, trainer_id = ?, total_hours = ? " +
+                    " WHERE id = ?;";
+            try {
+                jdbcTemplate.update(query, training.getTrainingName(), training.getDescription(), training.isCE(),
+                        training.getCeId(), training.getTrainerId(), training.getTotalHours(), training.getId());
+                ResponseEntity<Object> response = new ResponseEntity<>("Stored", HttpStatus.CREATED);
+                return response;
+            } catch (Exception e) {
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+        }
+    }
+
+    @Override
+    public ResponseEntity<Object> deleteTraining(long trainingId, JdbcTemplate jdbcTemplate) {
+        String query = "UPDATE " + Constants.TABLE_TRAININGS +
+                " SET soft_delete = 1 " +
+                " WHERE id = ?";
+        try{
+            jdbcTemplate.update(query,trainingId);
+            return new ResponseEntity<>("Deleted Skill", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 }

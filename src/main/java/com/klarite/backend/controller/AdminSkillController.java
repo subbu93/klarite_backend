@@ -19,6 +19,9 @@ public class AdminSkillController {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+    /*
+    Skills APIs
+    */
     @GetMapping("/skill_admin/get_all_skills")
     public List<Skill> getAllSkills() {
         return adminSkillService.getAllSkills(jdbcTemplate);
@@ -39,6 +42,9 @@ public class AdminSkillController {
         return adminSkillService.deleteSkill(id, jdbcTemplate);
     }
 
+    /*
+    Training APIs
+    */
     @GetMapping("/skill_admin/get_all_trainings")
     public List<Training> getAllTrainings() {
         return adminSkillService.getAllTrainings(jdbcTemplate);
@@ -52,5 +58,15 @@ public class AdminSkillController {
     @GetMapping("/skill_admin/get_trainer")
     public List<User> getTrainer() {
         return adminSkillService.getTrainer(jdbcTemplate);
+    }
+
+    @PostMapping("/skill_admin/add_training")
+    public ResponseEntity<Object> addTraining(@RequestBody Training training) {
+        return adminSkillService.addTraining(training, jdbcTemplate);
+    }
+
+    @DeleteMapping("/skill_admin/delete_training")
+    public ResponseEntity<Object> deleteTraining(@RequestParam(value = "id") long id) {
+        return adminSkillService.deleteTraining(id, jdbcTemplate);
     }
 }
