@@ -1,6 +1,8 @@
 package com.klarite.backend.controller;
 
 import com.klarite.backend.dto.Skill;
+import com.klarite.backend.dto.Training;
+import com.klarite.backend.dto.User;
 import com.klarite.backend.service.AdminSkillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -35,5 +37,20 @@ public class AdminSkillController {
     @DeleteMapping("/skill_admin/delete_skill")
     public ResponseEntity<Object> deleteSkill(@RequestParam(value = "id") long id) {
         return adminSkillService.deleteSkill(id, jdbcTemplate);
+    }
+
+    @GetMapping("/skill_admin/get_all_trainings")
+    public List<Training> getAllTrainings() {
+        return adminSkillService.getAllTrainings(jdbcTemplate);
+    }
+
+    @GetMapping("/skill_admin/get_training")
+    public Training getTraining(@RequestParam(value = "id") long trainingId) {
+        return adminSkillService.getTraining(trainingId,jdbcTemplate);
+    }
+
+    @GetMapping("/skill_admin/get_trainer")
+    public List<User> getTrainer() {
+        return adminSkillService.getTrainer(jdbcTemplate);
     }
 }

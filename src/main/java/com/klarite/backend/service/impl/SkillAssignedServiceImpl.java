@@ -20,7 +20,8 @@ public class SkillAssignedServiceImpl implements SkillAssignedService {
                 "       t2.user_id, " +
                 "       t2.skill_id as skill_id, "+
                 "       t2.cost_center_name AS cost_center_name, " +
-                "       skills.NAME         AS skills_name " +
+                "       skills.NAME         AS skills_name, " +
+                "       skills.threshold AS skill_threshold " +
                 "FROM   (SELECT t1.assignment_name  AS assignment_name, " +
                 "               t1.completion_date AS completion_date, " +
                 "               t1.user_id, " +
@@ -52,6 +53,7 @@ public class SkillAssignedServiceImpl implements SkillAssignedService {
             obj.setCostCenterName((String) row.get("cost_center_name"));
             obj.setCompletionDate((Date) row.get("completion_date"));
             obj.setEpisodeCount(getEpisodeCount((Long) row.get("skill_id"), userId, jdbcTemplate));
+            obj.setSkillThreshold((Integer) row.get("skill_threshold"));
 
             skillAssignments.add(obj);
         }

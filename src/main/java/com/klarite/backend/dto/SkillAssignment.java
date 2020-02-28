@@ -9,6 +9,7 @@ public class SkillAssignment {
     private String SkillValidatedBy;
     private Date CompletionDate;
     private Integer episodeCount;
+    private Integer skillThreshold;
 
     public String getName() {
         return name;
@@ -56,5 +57,13 @@ public class SkillAssignment {
 
     public void setEpisodeCount(Integer episodeCount) {
         this.episodeCount = episodeCount;
+    }
+
+    public Integer getSkillThreshold() {
+        return skillThreshold;
+    }
+
+    public void setSkillThreshold(Integer skillThreshold) {
+        this.skillThreshold = skillThreshold;
     }
 }

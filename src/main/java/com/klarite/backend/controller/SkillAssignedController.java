@@ -24,5 +24,4 @@ public class SkillAssignedController {
     public List<SkillAssignment> getAllAssignedSkills(@RequestParam(value = "id") long id) {
         return skillAssignedService.getAllAssignedSkills(id, jdbcTemplate);
     }
-
 }

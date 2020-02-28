@@ -2,12 +2,14 @@ package com.klarite.backend.dto;
 
 public class Skill {
     private Long id;
-    private String name;
+    private String skillName;
     private String description;
     private Integer threshold;
     private String skillTrainingPreRequisite;
 
-    public long getId() {
+    private Long trainingId;
+
+    public Long getId() {
         return id;
     }
 
@@ -15,12 +17,12 @@ public class Skill {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getSkillName() {
+        return skillName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setSkillName(String skillName) {
+        this.skillName = skillName;
     }
 
     public String getDescription() {
@@ -46,4 +48,13 @@ public class Skill {
     public void setSkillTrainingPreRequisite(String skillTrainingPreRequisite) {
         this.skillTrainingPreRequisite = skillTrainingPreRequisite;
     }
+
+    public Long getTrainingId() {
+        return trainingId;
+    }
+
+    public void setTrainingId(Long trainingId) {
+        this.trainingId = trainingId;
+    }
+
 }
