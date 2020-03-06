@@ -6,4 +6,8 @@ public class Constants {
     public static final String TABLE_SKILLS = "skills";
     public static final String TABLE_TRAININGS = "trainings";
     public static final String TABLE_USERS = "users";
+    public static final String TABLE_COST_CENTER = "cost_center";
+    public static final String TABLE_BUSINESS_UNIT = "business_unit";
+    public static final String TABLE_TRAINING_ASSIGNMENTS = "training_assignments";
+    public static final String TABLE_CONTACT_HOURS = "ce";
 }

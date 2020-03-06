@@ -7,6 +7,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public interface SkillAssignedService {
+public interface SkillAssignmentService {
     List<SkillAssignment> getAllAssignedSkills(long id, JdbcTemplate jdbcTemplate);
 }

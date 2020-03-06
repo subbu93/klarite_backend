@@ -1,7 +1,7 @@
 package com.klarite.backend.service.impl;
 
 import com.klarite.backend.dto.SkillAssignment;
-import com.klarite.backend.service.SkillAssignedService;
+import com.klarite.backend.service.SkillAssignmentService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class SkillAssignedServiceImpl implements SkillAssignedService {
+public class SkillAssignmentServiceImpl implements SkillAssignmentService {
 
     @Override
     public List<SkillAssignment> getAllAssignedSkills(long userId, JdbcTemplate jdbcTemplate) {
@@ -48,8 +48,10 @@ public class SkillAssignedServiceImpl implements SkillAssignedService {
         for (Map row : rows) {
             SkillAssignment obj = new SkillAssignment();
 
-            obj.setAssignedSkill(((String) row.get("assignment_name")));
-            obj.setName((String) row.get("skills_name"));
+            obj.setUserId(userId);
+            obj.setSkillId((Long) row.get("skill_id"));
+            obj.setAssignedSkill(((String) row.get("skills_name")));
+            obj.setSkillAssignmentName((String) row.get("assignment_name"));
             obj.setCostCenterName((String) row.get("cost_center_name"));
             obj.setCompletionDate((Date) row.get("completion_date"));
             obj.setEpisodeCount(getEpisodeCount((Long) row.get("skill_id"), userId, jdbcTemplate));

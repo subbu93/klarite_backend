@@ -1,5 +1,6 @@
 package com.klarite.backend.service;
 
+import com.klarite.backend.dto.ContactHours;
 import com.klarite.backend.dto.Skill;
 import com.klarite.backend.dto.Training;
 import com.klarite.backend.dto.User;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public interface AdminSkillService {
+public interface AdminService {
     ResponseEntity<Object> addSkill(Skill skill, JdbcTemplate jdbcTemplate);
 
     List<Skill> getAllSkills(JdbcTemplate jdbcTemplate);
@@ -28,4 +29,8 @@ public interface AdminSkillService {
     ResponseEntity<Object> addTraining(Training training, JdbcTemplate jdbcTemplate);
 
     ResponseEntity<Object> deleteTraining(long trainingId, JdbcTemplate jdbcTemplate);
+
+    ResponseEntity<Object> addContactHours(ContactHours ce, JdbcTemplate jdbcTemplate);
+
+    ContactHours getCeHrs(String state, String title, String position, JdbcTemplate jdbcTemplate);
 }

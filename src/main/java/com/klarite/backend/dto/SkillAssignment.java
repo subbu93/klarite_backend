@@ -1,9 +1,11 @@
 package com.klarite.backend.dto;
 
 import java.util.Date;
-import java.util.List;
 public class SkillAssignment {
-    private String name;
+
+    private Long skillId;
+    private Long userId;
+    private String skillAssignmentName;
     private String costCenterName;
     private String AssignedSkill;
     private String SkillValidatedBy;
@@ -11,12 +13,28 @@ public class SkillAssignment {
     private Integer episodeCount;
     private Integer skillThreshold;
 
-    public String getName() {
-        return name;
+    public Long getSkillId() {
+        return skillId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setSkillId(Long skillId) {
+        this.skillId = skillId;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getSkillAssignmentName() {
+        return skillAssignmentName;
+    }
+
+    public void setSkillAssignmentName(String name) {
+        this.skillAssignmentName = name;
     }
 
     public String getCostCenterName() {

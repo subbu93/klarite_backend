@@ -1,10 +1,11 @@
 package com.klarite.backend.service.impl;
 
 import com.klarite.backend.Constants;
+import com.klarite.backend.dto.ContactHours;
 import com.klarite.backend.dto.Skill;
 import com.klarite.backend.dto.Training;
 import com.klarite.backend.dto.User;
-import com.klarite.backend.service.AdminSkillService;
+import com.klarite.backend.service.AdminService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class AdminSkillServiceImpl implements AdminSkillService {
+public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<Skill> getAllSkills(JdbcTemplate jdbcTemplate) {
@@ -261,5 +262,63 @@ public class AdminSkillServiceImpl implements AdminSkillService {
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @Override
+    public ResponseEntity<Object> addContactHours(ContactHours ce, JdbcTemplate jdbcTemplate) {
+        String query = "";
+        if (ce.getId() == null) {
+            query = "INSERT INTO " + Constants.TABLE_CONTACT_HOURS +
+                    " (state, title, position , ce_hours_per_year) " +
+                    " VALUES      (?," +
+                    "             ?, " +
+                    "             ?," +
+                    "             ?); ";
+            try {
+                jdbcTemplate.update(query, ce.getState(), ce.getUserTitle(), ce.getPosition(), ce.getCeHrsPerYear());
+                ResponseEntity<Object> response = new ResponseEntity<>("Stored", HttpStatus.CREATED);
+                return response;
+            } catch (Exception e) {
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            query = "UPDATE " + Constants.TABLE_CONTACT_HOURS +
+                    " SET state = ?, title = ?, position = ?, ce_hours_per_year = ? " +
+                    " WHERE id = ?;";
+            try {
+                jdbcTemplate.update(query, ce.getState(), ce.getUserTitle(), ce.getPosition(),
+                        ce.getCeHrsPerYear(), ce.getId());
+                ResponseEntity<Object> response = new ResponseEntity<>("Stored", HttpStatus.CREATED);
+                return response;
+            } catch (Exception e) {
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+        }
+    }
+
+    @Override
+    public ContactHours getCeHrs(String state, String title, String position, JdbcTemplate jdbcTemplate) {
+        ContactHours ce = new ContactHours();
+        if(state == null || title == null || position == null){
+            return null;
+        }
+        String query = "SELECT * FROM " + Constants.TABLE_CONTACT_HOURS +
+                "       WHERE state = ?" +
+                "       AND position = ?" +
+                "       AND title = ?";
+        try {
+            Map<String, Object> row = jdbcTemplate.queryForMap(query, state, position, title);
+
+            ce.setId((Long) row.get("id"));
+            ce.setPosition((String) row.get("position"));
+            ce.setState((String) row.get("state"));
+            ce.setUserTitle((String) row.get("title"));
+            ce.setCeHrsPerYear((Integer) row.get("ce_hours_per_year"));
+        } catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+
+        return ce;
     }
 }

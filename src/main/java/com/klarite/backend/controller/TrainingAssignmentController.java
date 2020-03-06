@@ -1,7 +1,9 @@
 package com.klarite.backend.controller;
 
 import com.klarite.backend.dto.SkillAssignment;
-import com.klarite.backend.service.SkillAssignedService;
+import com.klarite.backend.dto.TrainingAssignment;
+import com.klarite.backend.service.SkillAssignmentService;
+import com.klarite.backend.service.TrainingAssignmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -13,14 +15,14 @@ import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
-public class SkillAssignedController {
+public class TrainingAssignmentController {
     @Autowired
-    private SkillAssignedService skillAssignedService;
+    private TrainingAssignmentService trainingAssignmentService;
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    @GetMapping("/assign_skill/get_assigned_skills")
-    public List<SkillAssignment> getAllAssignedSkills(@RequestParam(value = "id") long id) {
-        return skillAssignedService.getAllAssignedSkills(id, jdbcTemplate);
+        @GetMapping("/assign_training/get_assigned_trainings")
+    public List<TrainingAssignment> getAllAssignedTrainings(@RequestParam(value = "id") long userId) {
+        return trainingAssignmentService.getAllAssignedTrainings(userId, jdbcTemplate);
     }
 }
