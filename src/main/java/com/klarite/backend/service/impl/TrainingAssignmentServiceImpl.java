@@ -6,9 +6,6 @@ import com.klarite.backend.service.TrainingAssignmentService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.lang.invoke.ConstantCallSite;
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -51,7 +48,7 @@ public class TrainingAssignmentServiceImpl implements TrainingAssignmentService 
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, userId);
 
-        for (Map row : rows) {
+        for (Map<String, Object> row : rows) {
             TrainingAssignment trainingAssignment = new TrainingAssignment();
 
             trainingAssignment.setBusinessUnit((String) row.get("business_unit_name"));

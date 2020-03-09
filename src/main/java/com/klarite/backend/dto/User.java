@@ -1,7 +1,5 @@
 package com.klarite.backend.dto;
 
-import org.springframework.context.annotation.ComponentScan;
-
 public class User {
     private long id;
     private String ousId;

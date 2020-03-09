@@ -45,7 +45,7 @@ public class SkillAssignmentServiceImpl implements SkillAssignmentService {
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
 
-        for (Map row : rows) {
+        for (Map<String, Object> row : rows) {
             SkillAssignment obj = new SkillAssignment();
 
             obj.setUserId(userId);

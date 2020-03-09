@@ -1,6 +1,5 @@
 package com.klarite.backend.dto;
 
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 

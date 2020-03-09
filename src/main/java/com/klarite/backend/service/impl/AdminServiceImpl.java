@@ -33,7 +33,7 @@ public class AdminServiceImpl implements AdminService {
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
 
-        for (Map row : rows) {
+        for (Map<String, Object> row : rows) {
             Skill obj = new Skill();
 
             obj.setId(((Long) row.get("id")));
@@ -134,7 +134,7 @@ public class AdminServiceImpl implements AdminService {
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
 
-        for (Map row : rows) {
+        for (Map<String, Object> row : rows) {
             Training obj = new Training();
 
             obj.setId(((Long) row.get("id")));
@@ -193,7 +193,7 @@ public class AdminServiceImpl implements AdminService {
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
 
-        for (Map row : rows) {
+        for (Map<String, Object> row : rows) {
             User user = new User();
 
             user.setId(((Long) row.get("id")));
