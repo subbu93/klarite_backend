@@ -4,12 +4,12 @@ import java.util.Date;
 
 public class SkillEpisodes {
     private long id;
-    private int skillId;
-    private int userId;
+    private long skillId;
+    private long userId;
     private Date date;
     private String mrn;
     private boolean isObserved;
-    private Integer observerId = null;
+    private Long observerId = null;
     private boolean isAudited;
 
     public long getId() {
@@ -20,19 +20,19 @@ public class SkillEpisodes {
         this.id = id;
     }
 
-    public int getSkillId() {
+    public long getSkillId() {
         return skillId;
     }
 
-    public void setSkillId(int skillId) {
+    public void setSkillId(long skillId) {
         this.skillId = skillId;
     }
 
-    public int getUserId() {
+    public long getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
     }
 
@@ -60,11 +60,11 @@ public class SkillEpisodes {
         isObserved = observed;
     }
 
-    public Integer getObserverId() {
+    public Long getObserverId() {
         return observerId;
     }
 
-    public void setObserverId(Integer observerId) {
+    public void setObserverId(Long observerId) {
         this.observerId = observerId;
     }
 

@@ -78,8 +78,8 @@ public class AdminController {
 
     @GetMapping("/skill_admin/get_ce_hrs")
     public ContactHours getCeHrs(@RequestParam(value = "state") String state,
-                               @RequestParam(value = "title") String title,
-                               @RequestParam(value = "pos") String position) {
+                                 @RequestParam(value = "title") String title,
+                                 @RequestParam(value = "pos") String position) {
         return adminService.getCeHrs(state, title, position, jdbcTemplate);
     }
 }

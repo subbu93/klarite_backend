@@ -1,5 +1,6 @@
 package com.klarite.backend.dto;
 
+import java.sql.Time;
 import java.util.Date;
 import java.util.List;
 
@@ -9,7 +10,7 @@ public class TrainingAssignment {
     private Long trainingId;
     private String trainingName;
     private Date date;
-    private byte[] startTime;
+    private Time startTime;
     private String location;
     private List<Long> assignedUserId;
     private List<String> assignedUserName;
@@ -55,11 +56,11 @@ public class TrainingAssignment {
         this.date = date;
     }
 
-    public byte[] getStartTime() {
+    public Time getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(byte[] startTime) {
+    public void setStartTime(Time startTime) {
         this.startTime = startTime;
     }
 

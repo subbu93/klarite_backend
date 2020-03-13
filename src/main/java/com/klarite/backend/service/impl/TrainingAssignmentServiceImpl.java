@@ -6,6 +6,7 @@ import com.klarite.backend.service.TrainingAssignmentService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -53,7 +54,7 @@ public class TrainingAssignmentServiceImpl implements TrainingAssignmentService 
 
             trainingAssignment.setBusinessUnit((String) row.get("business_unit_name"));
             trainingAssignment.setCostCenter((String) row.get("cost_center_name"));
-            trainingAssignment.setStartTime((byte[]) row.get("start_time"));
+            trainingAssignment.setStartTime((Time) row.get("start_time"));
             trainingAssignment.setDate((Date) row.get("date"));
             trainingAssignment.setLocation((String) row.get("location"));
             trainingAssignment.setTrainingId((Long) row.get("training_id"));
