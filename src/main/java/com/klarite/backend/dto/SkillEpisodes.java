@@ -1,16 +1,16 @@
 package com.klarite.backend.dto;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class SkillEpisodes {
     private long id;
-    private long skillId;
     private long userId;
     private Date date;
     private String mrn;
-    private boolean isObserved;
-    private Long observerId = null;
     private boolean isAudited;
+    private List<SkillEpisode> episodes = new ArrayList<>();
 
     public long getId() {
         return id;
@@ -18,14 +18,6 @@ public class SkillEpisodes {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public long getSkillId() {
-        return skillId;
-    }
-
-    public void setSkillId(long skillId) {
-        this.skillId = skillId;
     }
 
     public long getUserId() {
@@ -52,27 +44,19 @@ public class SkillEpisodes {
         this.mrn = mrn;
     }
 
-    public boolean isObserved() {
-        return isObserved;
-    }
-
-    public void setObserved(boolean observed) {
-        isObserved = observed;
-    }
-
-    public Long getObserverId() {
-        return observerId;
-    }
-
-    public void setObserverId(Long observerId) {
-        this.observerId = observerId;
-    }
-
     public boolean isAudited() {
         return isAudited;
     }
 
-    public void setAudited(boolean audited) {
-        isAudited = audited;
+    public void setAudited(boolean isAudited) {
+        this.isAudited = isAudited;
+    }
+
+    public List<SkillEpisode> getEpisodes() {
+        return episodes;
+    }
+
+    public void setEpisodes(List<SkillEpisode> episodes) {
+        this.episodes = episodes;
     }
 }

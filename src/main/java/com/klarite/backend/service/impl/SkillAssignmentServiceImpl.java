@@ -62,13 +62,9 @@ public class SkillAssignmentServiceImpl implements SkillAssignmentService {
         return skillAssignments;
     }
 
-    Integer getEpisodeCount(long skillId, long userId, JdbcTemplate jdbcTemplate ) {
-        String query = "SELECT Count(*) AS count " +
-                "FROM   skill_episodes " +
-                "WHERE  user_id = ? " +
-                "       AND skill_id = ? ";
-
-        Map<String, Object> row = jdbcTemplate.queryForMap(query, userId, skillId);
+    Integer getEpisodeCount(Long skillId, Long userId, JdbcTemplate jdbcTemplate ) {
+        String query = "SELECT Count(*) AS count FROM skill_episodes WHERE skill_id=? AND episode_id IN (SELECT id FROM episodes WHERE user_id=?);";
+        Map<String, Object> row = jdbcTemplate.queryForMap(query, skillId, userId);
         return (Integer) row.get("count");
     }
 }
