@@ -1,6 +1,6 @@
 package com.klarite.backend.controller;
 
-import com.klarite.backend.dto.SkillEpisodes;
+import com.klarite.backend.dto.Episode;
 import com.klarite.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,12 @@ public class UserController {
     JdbcTemplate jdbcTemplate;
 
     @PostMapping("/user_services/add_episode")
-    public ResponseEntity<Object> addEpisodes(@RequestBody SkillEpisodes skillEpisodes) {
-        return userService.addSkillEpisodes(skillEpisodes, jdbcTemplate);
+    public ResponseEntity<Object> addEpisode(@RequestBody Episode skillEpisodes) {
+        return userService.addSkillEpisode(skillEpisodes, jdbcTemplate);
+    }
+
+    @PostMapping("/user_services/update_episode")
+    public ResponseEntity<Object> updateEpisode(@RequestBody Episode skillEpisodes) {
+        return userService.updateSkillEpisode(skillEpisodes, jdbcTemplate);
     }
 }

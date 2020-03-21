@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.klarite.backend.dto.SkillEpisode;
-import com.klarite.backend.dto.SkillEpisodes;
+import com.klarite.backend.dto.Episode;
 import com.klarite.backend.service.SkillService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -14,22 +14,46 @@ import org.springframework.stereotype.Service;
 @Service
 public class SkillServiceImpl implements SkillService {
     @Override
-    public List<SkillEpisodes> getAllEpisodes(Long userId, Long skillId, JdbcTemplate jdbcTemplate) {
+    public List<Episode> getAllEpisodes(Long userId, Long skillId, JdbcTemplate jdbcTemplate) {
         String query = "SELECT * FROM episodes WHERE user_id = $user";
         query = query.replace("$user", userId.toString());
 
-        List<SkillEpisodes> skillEpisodes = new ArrayList<>();
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
-        for (Map<String, Object> row : rows) {
+        return getEpisodes(rows, skillId, jdbcTemplate);
+    }
+
+    @Override
+    public Episode getEpisode(Long episodeId, JdbcTemplate jdbcTemplate) {
+        String query = "SELECT * FROM episodes WHERE id = $id";
+        query = query.replace("$id", episodeId.toString());
+
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
+        List<Episode> res = getEpisodes(rows, null, jdbcTemplate);
+        if (res.size() == 1)
+            return res.get(0);
+        else
+            return null;
+    }
+
+    private List<Episode> getEpisodes(List<Map<String, Object>> querryResult, Long skillId, JdbcTemplate jdbcTemplate) {
+        List<Episode> skillEpisodes = new ArrayList<>();
+        String query;
+        for (Map<String, Object> row : querryResult) {
             
             Long episode_id = (Long) row.get("id");
+            if (skillId != null) {
+                query = "SELECT * FROM skill_episodes WHERE episode_id = $e_id  AND skill_id = $skill";
+                query = query.replace("$e_id", episode_id.toString()).replace("$skill", skillId.toString());
+            }
+            else {
+                query = "SELECT * FROM skill_episodes WHERE episode_id = $e_id";
+                query = query.replace("$e_id", episode_id.toString());
+            }
 
-            query = "SELECT * FROM skill_episodes WHERE episode_id = $e_id  AND skill_id = $skill";
-            query = query.replace("$e_id", episode_id.toString()).replace("$skill", skillId.toString());
             List<Map<String, Object>> new_rows = jdbcTemplate.queryForList(query);
 
             if (new_rows.size() > 0) {
-                SkillEpisodes obj = new SkillEpisodes();
+                Episode obj = new Episode();
                 obj.setId(episode_id);
                 obj.setUserId((Long) row.get("user_id"));
                 obj.setDate((Date) row.get("date"));

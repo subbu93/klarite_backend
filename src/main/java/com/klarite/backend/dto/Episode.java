@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class SkillEpisodes {
+public class Episode {
     private long id;
     private long userId;
     private Date date;
@@ -12,7 +12,7 @@ public class SkillEpisodes {
     private boolean isAudited;
     private List<SkillEpisode> episodes = new ArrayList<>();
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 

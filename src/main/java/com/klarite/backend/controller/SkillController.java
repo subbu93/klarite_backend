@@ -1,6 +1,6 @@
 package com.klarite.backend.controller;
 
-import com.klarite.backend.dto.SkillEpisodes;
+import com.klarite.backend.dto.Episode;
 import com.klarite.backend.service.SkillService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +21,13 @@ public class SkillController {
     JdbcTemplate jdbcTemplate;
 
     @GetMapping("/skill/get_all_episodes")
-    public List<SkillEpisodes> getAllEpisodes(@RequestParam(value = "id") long id,
+    public List<Episode> getAllEpisodes(@RequestParam(value = "userId") long userId,
                                               @RequestParam(value = "skillId") long skillId) {
-        return skillService.getAllEpisodes(id, skillId, jdbcTemplate);
+        return skillService.getAllEpisodes(userId, skillId, jdbcTemplate);
+    }
+
+    @GetMapping("/skill/get_episode")
+    public Episode getEpisode(@RequestParam(value = "id") long id) {
+        return skillService.getEpisode(id, jdbcTemplate);
     }
 }
