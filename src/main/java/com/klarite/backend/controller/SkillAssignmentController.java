@@ -20,7 +20,14 @@ public class SkillAssignmentController {
     JdbcTemplate jdbcTemplate;
 
     @GetMapping("/assign_skill/get_assigned_skills")
-    public List<SkillAssignment> getAllAssignedSkills(@RequestParam(value = "id") long id) {
+    public List<SkillAssignment> getAllAssignedSkills(@RequestParam(required = false, value = "id") Long id) {
         return skillAssignmentService.getAllAssignedSkills(id, jdbcTemplate);
     }
+
+    @GetMapping("/assign_skill/get_assigned_skill")
+    public List<SkillAssignment> getAssignedSkills(@RequestParam(value = "id") Long assignmentId) {
+        return skillAssignmentService.getAssignedSkills(assignmentId, jdbcTemplate);
+    }
+
+
 }

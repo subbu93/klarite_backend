@@ -8,5 +8,7 @@ import java.util.List;
 
 @Component
 public interface SkillAssignmentService {
-    List<SkillAssignment> getAllAssignedSkills(long id, JdbcTemplate jdbcTemplate);
+    List<SkillAssignment> getAllAssignedSkills(Long id, JdbcTemplate jdbcTemplate);
+
+    List<SkillAssignment> getAssignedSkills(Long assignmentId, JdbcTemplate jdbcTemplate);
 }
