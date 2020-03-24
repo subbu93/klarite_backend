@@ -268,7 +268,7 @@ public class AdminServiceImpl implements AdminService {
     public ResponseEntity<Object> addContactHours(ContactHours ce, JdbcTemplate jdbcTemplate) {
         String query = "";
         if (ce.getId() == null) {
-            query = "INSERT INTO " + Constants.TABLE_CONTACT_HOURS +
+            query = "INSERT INTO " + Constants.TABLE_CONTINUED_EDUCATION +
                     " (state, title, position , ce_hours_per_year) " +
                     " VALUES      (?," +
                     "             ?, " +
@@ -282,7 +282,7 @@ public class AdminServiceImpl implements AdminService {
                 return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
             }
         } else {
-            query = "UPDATE " + Constants.TABLE_CONTACT_HOURS +
+            query = "UPDATE " + Constants.TABLE_CONTINUED_EDUCATION +
                     " SET state = ?, title = ?, position = ?, ce_hours_per_year = ? " +
                     " WHERE id = ?;";
             try {
@@ -302,7 +302,7 @@ public class AdminServiceImpl implements AdminService {
         if(state == null || title == null || position == null){
             return null;
         }
-        String query = "SELECT * FROM " + Constants.TABLE_CONTACT_HOURS +
+        String query = "SELECT * FROM " + Constants.TABLE_CONTINUED_EDUCATION +
                 "       WHERE state = ?" +
                 "       AND position = ?" +
                 "       AND title = ?";
