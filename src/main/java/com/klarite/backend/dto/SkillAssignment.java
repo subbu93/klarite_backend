@@ -1,14 +1,18 @@
 package com.klarite.backend.dto;
 
 import java.util.Date;
+import java.util.List;
+
 public class SkillAssignment {
 
+    private Long assignmentId;
     private Long skillId;
-    private Long userId;
+    private List<Long> userIds;
     private String skillAssignmentName;
     private String costCenterName;
+    private Integer costCenterId;
     private String AssignedSkill;
-    private String SkillValidatedBy;
+    private Long skillValidatorId;
     private Date CompletionDate;
     private Integer episodeCount;
     private Integer skillThreshold;
@@ -21,12 +25,12 @@ public class SkillAssignment {
         this.skillId = skillId;
     }
 
-    public Long getUserId() {
-        return userId;
+    public List<Long> getUserIds() {
+        return userIds;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUserIds(List<Long> userIds) {
+        this.userIds = userIds;
     }
 
     public String getSkillAssignmentName() {
@@ -53,14 +57,6 @@ public class SkillAssignment {
         AssignedSkill = assignedSkill;
     }
 
-    public String getSkillValidatedBy() {
-        return SkillValidatedBy;
-    }
-
-    public void setSkillValidatedBy(String skillValidatedBy) {
-        SkillValidatedBy = skillValidatedBy;
-    }
-
     public Date getCompletionDate() {
         return CompletionDate;
     }
@@ -83,5 +79,29 @@ public class SkillAssignment {
 
     public void setSkillThreshold(Integer skillThreshold) {
         this.skillThreshold = skillThreshold;
+    }
+
+    public Long getAssignmentId() {
+        return assignmentId;
+    }
+
+    public void setAssignmentId(Long assignmentId) {
+        this.assignmentId = assignmentId;
+    }
+
+    public Integer getCostCenterId() {
+        return costCenterId;
+    }
+
+    public void setCostCenterId(Integer costCenterId) {
+        this.costCenterId = costCenterId;
+    }
+
+    public Long getSkillValidatorId() {
+        return skillValidatorId;
+    }
+
+    public void setSkillValidatorId(Long skillValidatorId) {
+        this.skillValidatorId = skillValidatorId;
     }
 }

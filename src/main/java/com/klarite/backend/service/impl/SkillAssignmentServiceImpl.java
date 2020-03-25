@@ -1,10 +1,15 @@
 package com.klarite.backend.service.impl;
 
+import com.klarite.backend.Constants;
+import com.klarite.backend.dto.CostCenter;
 import com.klarite.backend.dto.SkillAssignment;
 import com.klarite.backend.service.SkillAssignmentService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,57 +20,46 @@ public class SkillAssignmentServiceImpl implements SkillAssignmentService {
 
     @Override
     public List<SkillAssignment> getAllAssignedSkills(Long userId, JdbcTemplate jdbcTemplate) {
-        String query = "SELECT t2.assignment_name  AS assignment_name, " +
-                "       t2.completion_date  AS completion_date, " +
-                "       t2.user_id, " +
-                "       t2.skill_id         AS skill_id, " +
-                "       t2.cost_center_name AS cost_center_name, " +
-                "       t2.first_name, " +
-                "       t2.last_name, " +
-                "       skills.NAME         AS skills_name, " +
-                "       skills.threshold    AS skill_threshold " +
-                "FROM   (SELECT t1.assignment_name AS assignment_name, " +
-                "               t1.completion_date AS completion_date, " +
-                "               t1.user_id, " +
-                "               cc.NAME            AS cost_center_name, " +
-                "               t1.skill_id," +
-                "               t1.first_name," +
-                "               t1.last_name" +
-                "        FROM   (SELECT sa.NAME            AS assignment_name, " +
-                "                       sa.completion_date AS completion_date, " +
-                "                       sa.user_id, " +
-                "                       u.first_name," +
-                "                       u.last_name," +
-                "                       u.cost_center_id, " +
-                "                       sa.skill_id " +
-                "                FROM   skill_assignments AS sa " +
-                "                       INNER JOIN users AS u " +
-                "                               ON sa.user_id = u.id) AS t1 " +
-                "               JOIN cost_center AS cc " +
-                "                 ON t1.cost_center_id = cc.id) AS t2 " +
-                "       INNER JOIN skills " +
-                "               ON t2.skill_id = skills.id ";
-                if(userId != null) {
-                    query += "WHERE  t2.user_id = " + userId;
-                }
+        String sAssignmentQuery = "SELECT * FROM " + Constants.TABLE_S_ASSIGNMENTS;
+        String skillAssignmentQuery = "SELECT * FROM " + Constants.TABLE_SKILL_ASSIGNMENTS +
+                " WHERE assignment_id = ?";
+        String costCenterIdQuery = "SELECT cost_center.* " +
+                "FROM   " + Constants.TABLE_USERS +
+                "       INNER JOIN " + Constants.TABLE_COST_CENTER +
+                "               ON users.cost_center_id = cost_center.id " +
+                "WHERE  users.id = ? ";
+        String thresholdQuery = "SELECT * FROM " + Constants.TABLE_SKILLS + " WHERE id = ?";
 
         List<SkillAssignment> skillAssignments = new ArrayList<>();
 
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sAssignmentQuery);
 
         for (Map<String, Object> row : rows) {
             SkillAssignment obj = new SkillAssignment();
-
-            obj.setUserId(userId);
+            List<Map<String, Object>> userRows = jdbcTemplate.queryForList(skillAssignmentQuery, (Long) row.get("id"));
+            if (userRows.size() == 0) {
+                continue;
+            }
+            obj.setAssignmentId((Long) row.get("id"));
+            List<Long> temp = new ArrayList<>();
+            for (Map<String, Object> userRow : userRows) {
+                temp.add((Long) userRow.get("user_id"));
+            }
+            obj.setUserIds(temp);
             obj.setSkillId((Long) row.get("skill_id"));
-            obj.setAssignedSkill(((String) row.get("skills_name")));
-            obj.setSkillAssignmentName((String) row.get("assignment_name"));
-            obj.setCostCenterName((String) row.get("cost_center_name"));
+            obj.setSkillAssignmentName((String) row.get("name"));
+
+            Map<String, Object> costCenterIdRow = jdbcTemplate.queryForMap(costCenterIdQuery, obj.getUserIds().get(0));
+            obj.setCostCenterName((String) costCenterIdRow.get("name"));
+            obj.setCostCenterId((Integer) costCenterIdRow.get("id"));
             obj.setCompletionDate((Date) row.get("completion_date"));
-            if(userId != null) {
+            obj.setSkillValidatorId((Long) row.get("validator_id"));
+            if (userId != null) {
                 obj.setEpisodeCount(getEpisodeCount((Long) row.get("skill_id"), userId, jdbcTemplate));
             }
-            obj.setSkillThreshold((Integer) row.get("skill_threshold"));
+
+            Map<String, Object> thresholdRow = jdbcTemplate.queryForMap(thresholdQuery, obj.getSkillId());
+            obj.setSkillThreshold((Integer) thresholdRow.get("threshold"));
 
             skillAssignments.add(obj);
         }
@@ -78,7 +72,101 @@ public class SkillAssignmentServiceImpl implements SkillAssignmentService {
 //        String query =
     }
 
-    Integer getEpisodeCount(Long skillId, Long userId, JdbcTemplate jdbcTemplate ) {
+    @Override
+    public ResponseEntity<Object> deleteAssignment(Long id, JdbcTemplate jdbcTemplate) {
+        try {
+            deleteSkillAssignment(id, jdbcTemplate);
+            deleteSAssignment(id, jdbcTemplate);
+            return new ResponseEntity<>("Deleted Assignment", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Override
+    public List<CostCenter> getCostCenters(JdbcTemplate jdbcTemplate) {
+        String query = "SELECT * from " + Constants.TABLE_COST_CENTER;
+        List<CostCenter> costCenters;
+        try {
+            costCenters = new ArrayList<>();
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
+            for (Map<String, Object> row : rows) {
+                CostCenter costCenter = new CostCenter();
+                costCenter.setId((Integer) row.get("id"));
+                costCenter.setCostCenterName((String) row.get("name"));
+                costCenters.add(costCenter);
+            }
+            return costCenters;
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public ResponseEntity<Object> addSkillAssignment(SkillAssignment skillAssignment, JdbcTemplate jdbcTemplate) {
+        if (skillAssignment.getAssignmentId() != null) {
+            return updateSkillAssignment(skillAssignment, jdbcTemplate);
+        } else {
+            String insertSAssignmentQuery = "INSERT INTO " + Constants.TABLE_S_ASSIGNMENTS +
+                    " VALUES(?,?,?,?); SELECT SCOPE_IDENTITY() as id;";
+            String insertSkillAssignmentQuery = "INSERT INTO " + Constants.TABLE_SKILL_ASSIGNMENTS +
+                    " VALUES(?,?);";
+            try {
+                Map<String, Object> row = jdbcTemplate.queryForMap(insertSAssignmentQuery, skillAssignment.getSkillId(),
+                        skillAssignment.getSkillAssignmentName(), skillAssignment.getCompletionDate(),
+                        skillAssignment.getSkillValidatorId());
+
+                BigDecimal assignmentId = (BigDecimal) row.get("id");
+
+                insertSkillAssignmentQuery(assignmentId.longValue(), skillAssignment, jdbcTemplate);
+                return new ResponseEntity<>("Updated", HttpStatus.CREATED);
+            } catch (Exception e) {
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+        }
+    }
+
+    private ResponseEntity<Object> updateSkillAssignment(SkillAssignment skillAssignment, JdbcTemplate jdbcTemplate) {
+        String updateSAssignmentQuery = "UPDATE " + Constants.TABLE_S_ASSIGNMENTS +
+                " SET skill_id = ?, name= ?, completion_date = ?, validator_id = ? " +
+                " WHERE id = ?;";
+        try {
+            jdbcTemplate.update(updateSAssignmentQuery, skillAssignment.getSkillId(),
+                    skillAssignment.getSkillAssignmentName(), skillAssignment.getCompletionDate(),
+                    skillAssignment.getSkillValidatorId(), skillAssignment.getAssignmentId());
+
+            deleteSkillAssignment(skillAssignment.getAssignmentId(), jdbcTemplate);
+            insertSkillAssignmentQuery(skillAssignment.getAssignmentId(), skillAssignment, jdbcTemplate);
+
+            ResponseEntity<Object> response = new ResponseEntity<>("Stored", HttpStatus.CREATED);
+            return response;
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private void insertSkillAssignmentQuery(Long assignmentId, SkillAssignment skillAssignment, JdbcTemplate jdbcTemplate) {
+        String insertSkillAssignmentQuery = "INSERT INTO " + Constants.TABLE_SKILL_ASSIGNMENTS +
+                " VALUES(?,?);";
+
+        for (Long userId : skillAssignment.getUserIds()) {
+            jdbcTemplate.update(insertSkillAssignmentQuery, assignmentId, userId);
+        }
+    }
+
+    private void deleteSAssignment(Long assignmentId, JdbcTemplate jdbcTemplate) {
+        String deleteSAssignmentQuery = "DELETE FROM " + Constants.TABLE_S_ASSIGNMENTS +
+                " WHERE  id = ? ";
+        jdbcTemplate.update(deleteSAssignmentQuery, assignmentId);
+    }
+
+    private void deleteSkillAssignment(Long assignmentId, JdbcTemplate jdbcTemplate) {
+        String deleteSkillAssignmentQuery = "DELETE FROM " + Constants.TABLE_SKILL_ASSIGNMENTS +
+                " WHERE  assignment_id = ? ";
+        jdbcTemplate.update(deleteSkillAssignmentQuery, assignmentId);
+    }
+
+    private Integer getEpisodeCount(Long skillId, Long userId, JdbcTemplate jdbcTemplate) {
         String query = "SELECT Count(*) AS count " +
                 "FROM   skill_episodes " +
                 "WHERE  skill_id = ? " +

@@ -12,4 +12,6 @@ public class Constants {
     public static final String TABLE_CONTACT_HOURS = " ce ";
     public static final String TABLE_EPISODES = " episodes ";
     public static final String TABLE_SKILL_EPISODES = " skill_episodes ";
+    public static final String TABLE_S_ASSIGNMENTS = " s_assignments ";
+    public static final String TABLE_SKILL_ASSIGNMENTS = "skill_assignments";
 }
