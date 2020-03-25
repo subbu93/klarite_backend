@@ -18,13 +18,13 @@ import java.util.Map;
 @Service
 public class UserServiceImpl implements UserService {
     @Override
-    public ResponseEntity<Object> addSkillEpisode(Episode skillEpisodes, JdbcTemplate jdbcTemplate) {
+    public ResponseEntity<Object> addSkillEpisode(Episode episode, JdbcTemplate jdbcTemplate) {
         try{
             String query = "INSERT INTO" + Constants.TABLE_EPISODES + "VALUES(?, ?, ?, ?); SELECT SCOPE_IDENTITY() as id;";
-            Map<String, Object> row = jdbcTemplate.queryForMap(query, skillEpisodes.getUserId(), skillEpisodes.getDate(), 
-                skillEpisodes.getMrn(), skillEpisodes.isAudited());
+            Map<String, Object> row = jdbcTemplate.queryForMap(query, episode.getUserId(), episode.getDate(), 
+                episode.getMrn(), episode.isAudited());
             BigDecimal episodeId = (BigDecimal) row.get("id");
-            insertSkillEpisodes(episodeId.longValue(), skillEpisodes.getEpisodes(), jdbcTemplate);
+            insertSkillEpisodes(episodeId.longValue(), episode.getEpisodes(), jdbcTemplate);
             return new ResponseEntity<>("Stored", HttpStatus.CREATED);
         } catch (Exception e){
             return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
@@ -86,7 +86,10 @@ public class UserServiceImpl implements UserService {
         
         String query = "INSERT INTO" + Constants.TABLE_SKILL_EPISODES + "VALUES(?, ?, ?, ?);";
         for (SkillEpisode skillEpisode : skillEpisodeList) {
-            jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(), skillEpisode.isObserved(), skillEpisode.getObserverId());
+            if (!skillEpisode.isObserved() || skillEpisode.getObserverId() == 0)
+                jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(), skillEpisode.isObserved(), null);
+            else
+                jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(), skillEpisode.isObserved(), skillEpisode.getObserverId());
         }
     }
 
