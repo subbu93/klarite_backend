@@ -1,6 +1,7 @@
 package com.klarite.backend.service.impl;
 
 import com.klarite.backend.Constants;
+import com.klarite.backend.dto.BusinessUnit;
 import com.klarite.backend.dto.CostCenter;
 import com.klarite.backend.dto.SkillAssignment;
 import com.klarite.backend.service.SkillAssignmentService;
@@ -45,11 +46,11 @@ public class SkillAssignmentServiceImpl implements SkillAssignmentService {
             for (Map<String, Object> userRow : userRows) {
                 temp.add((Long) userRow.get("user_id"));
             }
-            obj.setUserIds(temp);
+            obj.setAssignedUserIds(temp);
             obj.setSkillId((Long) row.get("skill_id"));
             obj.setSkillAssignmentName((String) row.get("name"));
 
-            Map<String, Object> costCenterIdRow = jdbcTemplate.queryForMap(costCenterIdQuery, obj.getUserIds().get(0));
+            Map<String, Object> costCenterIdRow = jdbcTemplate.queryForMap(costCenterIdQuery, obj.getAssignedUserIds().get(0));
             obj.setCostCenterName((String) costCenterIdRow.get("name"));
             obj.setCostCenterId((Integer) costCenterIdRow.get("id"));
             obj.setCompletionDate((Date) row.get("completion_date"));
@@ -64,12 +65,6 @@ public class SkillAssignmentServiceImpl implements SkillAssignmentService {
             skillAssignments.add(obj);
         }
         return skillAssignments;
-    }
-
-    @Override
-    public List<SkillAssignment> getAssignedSkills(Long assignmentId, JdbcTemplate jdbcTemplate) {
-        return null;
-//        String query =
     }
 
     @Override
@@ -103,14 +98,31 @@ public class SkillAssignmentServiceImpl implements SkillAssignmentService {
     }
 
     @Override
+    public List<BusinessUnit> getBusinessUnits(JdbcTemplate jdbcTemplate) {
+        String query = "SELECT * from " + Constants.TABLE_BUSINESS_UNIT;
+        List<BusinessUnit> businessUnits;
+        try {
+            businessUnits = new ArrayList<>();
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
+            for (Map<String, Object> row : rows) {
+                BusinessUnit businessUnit = new BusinessUnit();
+                businessUnit.setId((Integer) row.get("id"));
+                businessUnit.setBusinessUnitName((String) row.get("name"));
+                businessUnits.add(businessUnit);
+            }
+            return businessUnits;
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
     public ResponseEntity<Object> addSkillAssignment(SkillAssignment skillAssignment, JdbcTemplate jdbcTemplate) {
         if (skillAssignment.getAssignmentId() != null) {
             return updateSkillAssignment(skillAssignment, jdbcTemplate);
         } else {
             String insertSAssignmentQuery = "INSERT INTO " + Constants.TABLE_S_ASSIGNMENTS +
                     " VALUES(?,?,?,?); SELECT SCOPE_IDENTITY() as id;";
-            String insertSkillAssignmentQuery = "INSERT INTO " + Constants.TABLE_SKILL_ASSIGNMENTS +
-                    " VALUES(?,?);";
             try {
                 Map<String, Object> row = jdbcTemplate.queryForMap(insertSAssignmentQuery, skillAssignment.getSkillId(),
                         skillAssignment.getSkillAssignmentName(), skillAssignment.getCompletionDate(),
@@ -118,7 +130,7 @@ public class SkillAssignmentServiceImpl implements SkillAssignmentService {
 
                 BigDecimal assignmentId = (BigDecimal) row.get("id");
 
-                insertSkillAssignmentQuery(assignmentId.longValue(), skillAssignment, jdbcTemplate);
+                insertSkillAssignment(assignmentId.longValue(), skillAssignment, jdbcTemplate);
                 return new ResponseEntity<>("Updated", HttpStatus.CREATED);
             } catch (Exception e) {
                 return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -136,7 +148,7 @@ public class SkillAssignmentServiceImpl implements SkillAssignmentService {
                     skillAssignment.getSkillValidatorId(), skillAssignment.getAssignmentId());
 
             deleteSkillAssignment(skillAssignment.getAssignmentId(), jdbcTemplate);
-            insertSkillAssignmentQuery(skillAssignment.getAssignmentId(), skillAssignment, jdbcTemplate);
+            insertSkillAssignment(skillAssignment.getAssignmentId(), skillAssignment, jdbcTemplate);
 
             ResponseEntity<Object> response = new ResponseEntity<>("Stored", HttpStatus.CREATED);
             return response;
@@ -145,11 +157,11 @@ public class SkillAssignmentServiceImpl implements SkillAssignmentService {
         }
     }
 
-    private void insertSkillAssignmentQuery(Long assignmentId, SkillAssignment skillAssignment, JdbcTemplate jdbcTemplate) {
+    private void insertSkillAssignment(Long assignmentId, SkillAssignment skillAssignment, JdbcTemplate jdbcTemplate) {
         String insertSkillAssignmentQuery = "INSERT INTO " + Constants.TABLE_SKILL_ASSIGNMENTS +
                 " VALUES(?,?);";
 
-        for (Long userId : skillAssignment.getUserIds()) {
+        for (Long userId : skillAssignment.getAssignedUserIds()) {
             jdbcTemplate.update(insertSkillAssignmentQuery, assignmentId, userId);
         }
     }

@@ -7,7 +7,7 @@ public class SkillAssignment {
 
     private Long assignmentId;
     private Long skillId;
-    private List<Long> userIds;
+    private List<Long> assignedUserIds;
     private String skillAssignmentName;
     private String costCenterName;
     private Integer costCenterId;
@@ -25,12 +25,12 @@ public class SkillAssignment {
         this.skillId = skillId;
     }
 
-    public List<Long> getUserIds() {
-        return userIds;
+    public List<Long> getAssignedUserIds() {
+        return assignedUserIds;
     }
 
-    public void setUserIds(List<Long> userIds) {
-        this.userIds = userIds;
+    public void setAssignedUserIds(List<Long> assignedUserIds) {
+        this.assignedUserIds = assignedUserIds;
     }
 
     public String getSkillAssignmentName() {

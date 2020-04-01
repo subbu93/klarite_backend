@@ -1,5 +1,6 @@
 package com.klarite.backend.controller;
 
+import com.klarite.backend.dto.BusinessUnit;
 import com.klarite.backend.dto.CostCenter;
 import com.klarite.backend.dto.SkillAssignment;
 import com.klarite.backend.service.SkillAssignmentService;
@@ -23,19 +24,19 @@ public class SkillAssignmentController {
         return skillAssignmentService.getAllAssignedSkills(id, jdbcTemplate);
     }
 
-    @GetMapping("/assign_skill/get_assigned_skill")
-    public List<SkillAssignment> getAssignedSkills(@RequestParam(value = "id") Long assignmentId) {
-        return skillAssignmentService.getAssignedSkills(assignmentId, jdbcTemplate);
-    }
-
     @DeleteMapping("/assign_skill/delete_assigned_skill")
     public ResponseEntity<Object> deleteAssignment(@RequestParam(value = "id") Long id) {
         return skillAssignmentService.deleteAssignment(id, jdbcTemplate);
     }
 
     @GetMapping("/assign_skill/get_cost_centers")
-    public List<CostCenter> getCostCenters(){
+    public List<CostCenter> getCostCenters() {
         return skillAssignmentService.getCostCenters(jdbcTemplate);
+    }
+
+    @GetMapping("/assign_skill/get_business_units")
+    public List<BusinessUnit> getBusinessUnits() {
+        return skillAssignmentService.getBusinessUnits(jdbcTemplate);
     }
 
     @PostMapping("/assign_skill/add_skill_assignment")

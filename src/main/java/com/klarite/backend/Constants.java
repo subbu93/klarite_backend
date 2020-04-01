@@ -8,7 +8,6 @@ public class Constants {
     public static final String TABLE_USERS = " users ";
     public static final String TABLE_COST_CENTER = " cost_center ";
     public static final String TABLE_BUSINESS_UNIT = " business_unit ";
-    public static final String TABLE_TRAINING_ASSIGNMENTS = " training_assignments ";
     public static final String TABLE_CONTINUED_EDUCATION = " ce ";
     public static final String TABLE_EPISODES = " episodes ";
     public static final String TABLE_SKILL_EPISODES = " skill_episodes ";
@@ -16,4 +15,6 @@ public class Constants {
     public static final String TABLE_TRAINING_ATTENDANCE = " training_attendance ";
     public static final String TABLE_S_ASSIGNMENTS = " s_assignments ";
     public static final String TABLE_SKILL_ASSIGNMENTS = "skill_assignments";
+    public static final String TABLE_T_ASSIGNMENTS = " t_assignments ";
+    public static final String TABLE_TRAINING_ASSIGNMENTS = "training_assignments";
 }

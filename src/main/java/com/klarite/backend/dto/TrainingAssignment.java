@@ -5,16 +5,36 @@ import java.util.Date;
 import java.util.List;
 
 public class TrainingAssignment {
+    private String trainingAssignmentName;
+    private Long assignmentId;
     private String businessUnit;
+    private Integer businessUnitId;
     private String costCenter;
+    private Integer costCenterId;
     private Long trainingId;
     private String trainingName;
     private Date date;
     private Time startTime;
     private String location;
-    private List<Long> assignedUserId;
+    private List<Long> assignedUserIds;
     private List<String> assignedUserName;
+    private String uuid;
 
+    public String getTrainingAssignmentName() {
+        return trainingAssignmentName;
+    }
+
+    public void setTrainingAssignmentName(String trainingAssignmentName) {
+        this.trainingAssignmentName = trainingAssignmentName;
+    }
+
+    public Long getAssignmentId() {
+        return assignmentId;
+    }
+
+    public void setAssignmentId(Long assignmentId) {
+        this.assignmentId = assignmentId;
+    }
 
     public String getBusinessUnit() {
         return businessUnit;
@@ -72,12 +92,12 @@ public class TrainingAssignment {
         this.location = location;
     }
 
-    public List<Long> getAssignedUserId() {
-        return assignedUserId;
+    public List<Long> getAssignedUserIds() {
+        return assignedUserIds;
     }
 
-    public void setAssignedUserId(List<Long> assignedUserId) {
-        this.assignedUserId = assignedUserId;
+    public void setAssignedUserIds(List<Long> assignedUserIds) {
+        this.assignedUserIds = assignedUserIds;
     }
 
     public List<String> getAssignedUserName() {
@@ -86,5 +106,29 @@ public class TrainingAssignment {
 
     public void setAssignedUserName(List<String> assignedUserName) {
         this.assignedUserName = assignedUserName;
+    }
+
+    public Integer getBusinessUnitId() {
+        return businessUnitId;
+    }
+
+    public void setBusinessUnitId(Integer businessUnitId) {
+        this.businessUnitId = businessUnitId;
+    }
+
+    public Integer getCostCenterId() {
+        return costCenterId;
+    }
+
+    public void setCostCenterId(Integer costCenterId) {
+        this.costCenterId = costCenterId;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 }
