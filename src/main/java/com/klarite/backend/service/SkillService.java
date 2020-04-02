@@ -2,10 +2,7 @@ package com.klarite.backend.service;
 
 import java.util.List;
 
-import com.klarite.backend.dto.BusinessUnit;
-import com.klarite.backend.dto.CostCenter;
-import com.klarite.backend.dto.Episode;
-import com.klarite.backend.dto.SkillAssignment;
+import com.klarite.backend.dto.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -13,7 +10,7 @@ public interface SkillService {
     List<Episode> getAllEpisodes(Long userId, Long skillId, JdbcTemplate jdbcTemplate);
     Episode getEpisode(Long episodeId, JdbcTemplate jdbcTemplate);
 
-    List<SkillAssignment> getAllAssignedSkills(Long id, JdbcTemplate jdbcTemplate);
+    List<SkillAssignment> getAllAssignedSkills(JdbcTemplate jdbcTemplate);
 
     ResponseEntity<Object> deleteAssignment(Long id, JdbcTemplate jdbcTemplate);
 
@@ -22,4 +19,6 @@ public interface SkillService {
     List<BusinessUnit> getBusinessUnits(JdbcTemplate jdbcTemplate);
 
     ResponseEntity<Object> addSkillAssignment(SkillAssignment skillAssignment, JdbcTemplate jdbcTemplate);
+
+    List<Skill> getAssignedSkills(Long userId, JdbcTemplate jdbcTemplate);
 }

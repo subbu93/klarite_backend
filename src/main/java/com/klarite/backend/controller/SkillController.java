@@ -1,9 +1,6 @@
 package com.klarite.backend.controller;
 
-import com.klarite.backend.dto.BusinessUnit;
-import com.klarite.backend.dto.CostCenter;
-import com.klarite.backend.dto.Episode;
-import com.klarite.backend.dto.SkillAssignment;
+import com.klarite.backend.dto.*;
 import com.klarite.backend.service.SkillService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +18,9 @@ public class SkillController {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    @GetMapping("/assign_skill/get_assigned_skills")
-    public List<SkillAssignment> getAllAssignedSkills(@RequestParam(required = false, value = "id") Long id) {
-        return skillService.getAllAssignedSkills(id, jdbcTemplate);
+    @GetMapping("/assign_skill/get_all_assignments")
+    public List<SkillAssignment> getAllAssignedSkills() {
+        return skillService.getAllAssignedSkills(jdbcTemplate);
     }
 
     @DeleteMapping("/assign_skill/delete_assigned_skill")
@@ -55,5 +52,10 @@ public class SkillController {
     @GetMapping("/skill/get_episode")
     public Episode getEpisode(@RequestParam(value = "id") long id) {
         return skillService.getEpisode(id, jdbcTemplate);
+    }
+
+    @GetMapping("/skill/get_assigned_skills")
+    public List<Skill> getAssignedSkills(@RequestParam(required = false, value = "userId") Long userId) {
+        return skillService.getAssignedSkills(userId, jdbcTemplate);
     }
 }

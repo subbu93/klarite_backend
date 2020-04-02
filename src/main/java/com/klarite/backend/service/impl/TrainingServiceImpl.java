@@ -2,7 +2,8 @@ package com.klarite.backend.service.impl;
 
 import com.klarite.backend.Constants;
 import com.klarite.backend.dto.TrainingAssignment;
-import com.klarite.backend.service.TrainingAssignmentService;
+import com.klarite.backend.dto.User;
+import com.klarite.backend.service.TrainingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class TrainingAssignmentServiceImpl implements TrainingAssignmentService {
+public class TrainingServiceImpl implements TrainingService {
     @Override
     public List<TrainingAssignment> getAllAssignedTrainings(Long userId, JdbcTemplate jdbcTemplate) {
         String tAssignmentQuery = "SELECT * FROM " + Constants.TABLE_T_ASSIGNMENTS;
@@ -103,6 +104,11 @@ public class TrainingAssignmentServiceImpl implements TrainingAssignmentService 
                 return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
             }
         }
+    }
+
+    @Override
+    public List<User> getAttendanceList(JdbcTemplate jdbcTemplate) {
+        return null;
     }
 
     private ResponseEntity<Object> updateTrainingAssignment(TrainingAssignment trainingAssignment,

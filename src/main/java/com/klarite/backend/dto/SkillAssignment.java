@@ -14,7 +14,6 @@ public class SkillAssignment {
     private String AssignedSkill;
     private Long skillValidatorId;
     private Date CompletionDate;
-    private Integer episodeCount;
     private Integer skillThreshold;
 
     public Long getSkillId() {
@@ -63,14 +62,6 @@ public class SkillAssignment {
 
     public void setCompletionDate(Date completionDate) {
         CompletionDate = completionDate;
-    }
-
-    public Integer getEpisodeCount() {
-        return episodeCount;
-    }
-
-    public void setEpisodeCount(Integer episodeCount) {
-        this.episodeCount = episodeCount;
     }
 
     public Integer getSkillThreshold() {

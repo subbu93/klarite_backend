@@ -6,8 +6,9 @@ public class Skill {
     private String description;
     private Integer threshold;
     private String skillTrainingPreRequisite;
-
+    private Integer episodeCount;
     private Long trainingId;
+
 
     public Long getId() {
         return id;
@@ -55,6 +56,14 @@ public class Skill {
 
     public void setTrainingId(Long trainingId) {
         this.trainingId = trainingId;
+    }
+
+    public Integer getEpisodeCount() {
+        return episodeCount;
+    }
+
+    public void setEpisodeCount(Integer episodeCount) {
+        this.episodeCount = episodeCount;
     }
 
 }

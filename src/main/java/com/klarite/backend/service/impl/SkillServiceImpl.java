@@ -1,11 +1,5 @@
 package com.klarite.backend.service.impl;
 
-import java.math.BigDecimal;
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import com.klarite.backend.Constants;
 import com.klarite.backend.dto.*;
 import com.klarite.backend.service.SkillService;
@@ -14,11 +8,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 @Service
 public class SkillServiceImpl implements SkillService {
 
     @Override
-    public List<SkillAssignment> getAllAssignedSkills(Long userId, JdbcTemplate jdbcTemplate) {
+    public List<SkillAssignment> getAllAssignedSkills(JdbcTemplate jdbcTemplate) {
         String sAssignmentQuery = "SELECT * FROM " + Constants.TABLE_S_ASSIGNMENTS;
         String skillAssignmentQuery = "SELECT * FROM " + Constants.TABLE_SKILL_ASSIGNMENTS +
                 " WHERE assignment_id = ?";
@@ -53,12 +53,9 @@ public class SkillServiceImpl implements SkillService {
             obj.setCostCenterId((Integer) costCenterIdRow.get("id"));
             obj.setCompletionDate((java.util.Date) row.get("completion_date"));
             obj.setSkillValidatorId((Long) row.get("validator_id"));
-            if (userId != null) {
-                obj.setEpisodeCount(getEpisodeCount((Long) row.get("skill_id"), userId, jdbcTemplate));
-            }
 
-            Map<String, Object> thresholdRow = jdbcTemplate.queryForMap(thresholdQuery, obj.getSkillId());
-            obj.setSkillThreshold((Integer) thresholdRow.get("threshold"));
+//            Map<String, Object> thresholdRow = jdbcTemplate.queryForMap(thresholdQuery, obj.getSkillId());
+//            obj.setSkillThreshold((Integer) thresholdRow.get("threshold"));
 
             skillAssignments.add(obj);
         }
@@ -136,6 +133,38 @@ public class SkillServiceImpl implements SkillService {
         }
     }
 
+    @Override
+    public List<Skill> getAssignedSkills(Long userId, JdbcTemplate jdbcTemplate) {
+        String query = "SELECT * " +
+                " FROM " + Constants.TABLE_SKILLS +
+                " WHERE  id IN (SELECT skill_id " +
+                "              FROM " + Constants.TABLE_S_ASSIGNMENTS +
+                "              WHERE  id IN (SELECT assignment_id " +
+                "                            FROM " + Constants.TABLE_SKILL_ASSIGNMENTS +
+                "                            WHERE  user_id = ?)) ";
+        List<Skill> skills;
+        try {
+            skills = new ArrayList<>();
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
+            for (Map<String, Object> row : rows) {
+                Skill skill = new Skill();
+
+                skill.setId(((Long) row.get("id")));
+                skill.setSkillName((String) row.get("name"));
+                skill.setDescription((String) row.get("description"));
+                skill.setThreshold((Integer) row.get("threshold"));
+                skill.setSkillTrainingPreRequisite((String) row.get("training_prerequisite"));
+                skill.setTrainingId((Long) row.get("training_id"));
+                skill.setEpisodeCount(getEpisodeCount(skill.getId(), userId, jdbcTemplate));
+                skills.add(skill);
+
+            }
+        } catch (Exception e) {
+
+        }
+        return null;
+    }
+
     private ResponseEntity<Object> updateSkillAssignment(SkillAssignment skillAssignment, JdbcTemplate jdbcTemplate) {
         String updateSAssignmentQuery = "UPDATE " + Constants.TABLE_S_ASSIGNMENTS +
                 " SET skill_id = ?, name= ?, completion_date = ?, validator_id = ? " +
@@ -186,6 +215,7 @@ public class SkillServiceImpl implements SkillService {
         Map<String, Object> row = jdbcTemplate.queryForMap(query, skillId, userId);
         return (Integer) row.get("count");
     }
+
     @Override
     public List<Episode> getAllEpisodes(Long userId, Long skillId, JdbcTemplate jdbcTemplate) {
         String query = "SELECT * FROM episodes WHERE user_id = $user";
@@ -212,13 +242,12 @@ public class SkillServiceImpl implements SkillService {
         List<Episode> skillEpisodes = new ArrayList<>();
         String query;
         for (Map<String, Object> row : querryResult) {
-            
+
             Long episode_id = (Long) row.get("id");
             if (skillId != null) {
                 query = "SELECT * FROM skill_episodes WHERE episode_id = $e_id  AND skill_id = $skill";
                 query = query.replace("$e_id", episode_id.toString()).replace("$skill", skillId.toString());
-            }
-            else {
+            } else {
                 query = "SELECT * FROM skill_episodes WHERE episode_id = $e_id";
                 query = query.replace("$e_id", episode_id.toString());
             }
