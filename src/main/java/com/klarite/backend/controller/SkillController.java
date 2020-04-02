@@ -1,14 +1,15 @@
 package com.klarite.backend.controller;
 
+import com.klarite.backend.dto.BusinessUnit;
+import com.klarite.backend.dto.CostCenter;
 import com.klarite.backend.dto.Episode;
+import com.klarite.backend.dto.SkillAssignment;
 import com.klarite.backend.service.SkillService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,6 +20,31 @@ public class SkillController {
     private SkillService skillService;
     @Autowired
     JdbcTemplate jdbcTemplate;
+
+    @GetMapping("/assign_skill/get_assigned_skills")
+    public List<SkillAssignment> getAllAssignedSkills(@RequestParam(required = false, value = "id") Long id) {
+        return skillService.getAllAssignedSkills(id, jdbcTemplate);
+    }
+
+    @DeleteMapping("/assign_skill/delete_assigned_skill")
+    public ResponseEntity<Object> deleteAssignment(@RequestParam(value = "id") Long id) {
+        return skillService.deleteAssignment(id, jdbcTemplate);
+    }
+
+    @GetMapping("/assign_skill/get_cost_centers")
+    public List<CostCenter> getCostCenters() {
+        return skillService.getCostCenters(jdbcTemplate);
+    }
+
+    @GetMapping("/assign_skill/get_business_units")
+    public List<BusinessUnit> getBusinessUnits() {
+        return skillService.getBusinessUnits(jdbcTemplate);
+    }
+
+    @PostMapping("/assign_skill/add_skill_assignment")
+    public ResponseEntity<Object> addSkillAssignment(@RequestBody SkillAssignment skillAssignment) {
+        return skillService.addSkillAssignment(skillAssignment, jdbcTemplate);
+    }
 
     @GetMapping("/skill/get_all_episodes")
     public List<Episode> getAllEpisodes(@RequestParam(value = "userId") long userId,
