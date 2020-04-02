@@ -145,7 +145,7 @@ public class SkillServiceImpl implements SkillService {
         List<Skill> skills;
         try {
             skills = new ArrayList<>();
-            List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, userId);
             for (Map<String, Object> row : rows) {
                 Skill skill = new Skill();
 
@@ -157,12 +157,11 @@ public class SkillServiceImpl implements SkillService {
                 skill.setTrainingId((Long) row.get("training_id"));
                 skill.setEpisodeCount(getEpisodeCount(skill.getId(), userId, jdbcTemplate));
                 skills.add(skill);
-
             }
+            return skills;
         } catch (Exception e) {
-
+            return new ArrayList<>();
         }
-        return null;
     }
 
     private ResponseEntity<Object> updateSkillAssignment(SkillAssignment skillAssignment, JdbcTemplate jdbcTemplate) {
