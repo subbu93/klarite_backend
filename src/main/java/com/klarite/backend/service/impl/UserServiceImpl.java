@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,11 +34,33 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<Object> updateSkillEpisode(Episode episode, JdbcTemplate jdbcTemplate) {
-        String query = "UPDATE" + Constants.TABLE_EPISODES + "SET date = ?, mrn = ?, is_audited = ? WHERE id = ?;";
         try {
+            String query = "UPDATE" + Constants.TABLE_EPISODES + "SET date = ?, mrn = ?, is_audited = ? WHERE id = ?;";
             jdbcTemplate.update(query, episode.getDate(), episode.getMrn(), episode.isAudited(), episode.getId());
             insertSkillEpisodes(episode.getId().longValue(), episode.getEpisodes(), jdbcTemplate);
             return new ResponseEntity<>("Updated", HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Override
+    public ResponseEntity<Object> markAttendance(String uuid, Long userId, JdbcTemplate jdbcTemplate) {
+        try{
+            Long trainingAssignmentId = isUUIDValid(uuid, jdbcTemplate);
+            if (trainingAssignmentId != null) {
+                if (isTimeValid(trainingAssignmentId, jdbcTemplate)) {
+                    String query = "UPDATE " + Constants.TABLE_TRAINING_ASSIGNMENTS + 
+                                " SET attended = 1 WHERE uuid = ? and user_id = ?";
+                    jdbcTemplate.update(query, trainingAssignmentId, userId);
+                    return new ResponseEntity<>(Constants.MSG_MARK_ATTENDANCE_SUCCESS, HttpStatus.OK);
+                }
+                else
+                    return new ResponseEntity<>(Constants.MSG_MARK_ATTENDANCE_INVALID_TIME, HttpStatus.BAD_REQUEST);
+            }
+            else
+                return new ResponseEntity<>(Constants.MSG_MARK_ATTENDANCE_INVALID_UUID, HttpStatus.BAD_REQUEST);
+
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -96,5 +119,19 @@ public class UserServiceImpl implements UserService {
     private void deleteExisitingEPisodes(long episodeId, JdbcTemplate jdbcTemplate) {
         String query = "DELETE FROM" + Constants.TABLE_SKILL_EPISODES + "where episode_id = ?;";
         jdbcTemplate.update(query, episodeId);
+    }
+
+    Long isUUIDValid(String uuid, JdbcTemplate jdbcTemplate) {
+        String query = "SELECT id FROM " + Constants.TABLE_T_ASSIGNMENTS + " WHERE  uuid = ?)";
+        Map<String, Object> row = jdbcTemplate.queryForMap(query, uuid);
+        return row.size() == 1 ? (Long) row.get("id") : null;
+    }
+
+    private boolean isTimeValid(Long trainingAssignmentId, JdbcTemplate jdbcTemplate) {
+        String query = "SELECT uuid FROM " + Constants.TABLE_T_ASSIGNMENTS + " WHERE  id = ?)";
+        Map<String, Object> row = jdbcTemplate.queryForMap(query, trainingAssignmentId);
+        boolean isDateValid = ((Date) row.get("date")).equals(new Date(System.currentTimeMillis()));
+        boolean isTimeValid = true;    //todo ishan: fix this
+        return isDateValid && isTimeValid;
     }
 }

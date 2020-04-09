@@ -33,7 +33,6 @@ public class TrainingServiceImpl implements TrainingService {
                 "       INNER JOIN " + Constants.TABLE_BUSINESS_UNIT +
                 "               ON users.business_unit_id = business_unit.id " +
                 "WHERE  users.id = ? ";
-        String thresholdQuery = "SELECT * FROM " + Constants.TABLE_SKILLS + " WHERE id = ?";
 
         List<TrainingAssignment> trainingAssignments = new ArrayList<>();
 

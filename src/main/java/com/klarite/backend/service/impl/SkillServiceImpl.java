@@ -27,7 +27,6 @@ public class SkillServiceImpl implements SkillService {
                 "       INNER JOIN " + Constants.TABLE_COST_CENTER +
                 "               ON users.cost_center_id = cost_center.id " +
                 "WHERE  users.id = ? ";
-        String thresholdQuery = "SELECT * FROM " + Constants.TABLE_SKILLS + " WHERE id = ?";
 
         List<SkillAssignment> skillAssignments = new ArrayList<>();
 

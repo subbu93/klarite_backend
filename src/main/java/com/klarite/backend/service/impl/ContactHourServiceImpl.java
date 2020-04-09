@@ -45,12 +45,12 @@ public class ContactHourServiceImpl implements ContactHourService {
         List<Training> trainings = new ArrayList<>();
         String query = "SELECT * FROM " + Constants.TABLE_TRAININGS + 
                        " WHERE is_ce = 1 AND soft_delete = 0 AND id IN (SELECT training_id FROM "
-                       + Constants.TABLE_TRAINING_ATTENDANCE + " WHERE user_id = ?);";
+                       + Constants.TABLE_T_ASSIGNMENTS + " WHERE id IN (SELECT assignment_id FROM "
+                       + Constants.TABLE_TRAINING_ASSIGNMENTS + " WHERE user_id = ? and attended = 1));";
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, userId);
         for (Map<String, Object> row : rows) {
             Training obj = new Training();
 
-            obj.setId((Long) row.get("skill_id"));
             obj.setTrainingName((String) row.get("name"));
             obj.setDescription((String) row.get("description"));
             obj.setCE((Boolean) row.get("is_ce"));
