@@ -78,7 +78,7 @@ public class ContactHourServiceImpl implements ContactHourService {
             obj.setDate((Date) row.get("date"));
             obj.setCE((Boolean) row.get("is_ce"));
             obj.setPresenterName((String) row.get("presenter"));
-            obj.setTotalHours((Integer) row.get("total_hours"));
+            obj.setTotalHours((Float) row.get("total_hours"));
             obj.setDescription((String) row.get("description"));
 
             educations.add(obj);

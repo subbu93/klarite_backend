@@ -10,7 +10,7 @@ public class ContinuedEducation {
     private Date date;
     private boolean isCE;
     private String presenterName;
-    private int totalHours;
+    private Float totalHours;
     private String description;
 
     public Long getId() {
@@ -53,11 +53,11 @@ public class ContinuedEducation {
         this.presenterName = presenterName;
     }
 
-    public int getTotalHours() {
+    public Float getTotalHours() {
         return totalHours;
     }
 
-    public void setTotalHours(int totalHours) {
+    public void setTotalHours(Float totalHours) {
         this.totalHours = totalHours;
     }
 
