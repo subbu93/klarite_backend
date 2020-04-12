@@ -122,9 +122,9 @@ public class UserServiceImpl implements UserService {
     }
 
     Long isUUIDValid(String uuid, JdbcTemplate jdbcTemplate) {
-        String query = "SELECT id FROM " + Constants.TABLE_T_ASSIGNMENTS + " WHERE  uuid = ?)";
-        Map<String, Object> row = jdbcTemplate.queryForMap(query, uuid);
-        return row.size() == 1 ? (Long) row.get("id") : null;
+        String query = "SELECT id FROM " + Constants.TABLE_T_ASSIGNMENTS + " WHERE  uuid = ?";
+        List<Map<String, Object>> row = jdbcTemplate.queryForList(query, uuid);
+        return row.size() == 1 ? (Long) row.get(0).get("id") : null;
     }
 
     private boolean isTimeValid(Long trainingAssignmentId, JdbcTemplate jdbcTemplate) {
