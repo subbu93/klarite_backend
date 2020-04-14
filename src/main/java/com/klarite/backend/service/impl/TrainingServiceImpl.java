@@ -107,8 +107,42 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     @Override
-    public List<User> getAttendanceList(JdbcTemplate jdbcTemplate) {
-        return null;
+    public List<User> getAttendanceList(Long trainingAssignmentId, JdbcTemplate jdbcTemplate) {
+        String query = "SELECT * " +
+                "FROM   "+Constants.TABLE_USERS+" AS u " +
+                "       INNER JOIN (SELECT * " +
+                "                   FROM " + Constants.TABLE_TRAINING_ASSIGNMENTS+
+                "                   WHERE  assignment_id = ?) AS t1 " +
+                "               ON u.id = t1.user_id ";
+
+        List<User> users;
+        try {
+            users = new ArrayList<>();
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, trainingAssignmentId);
+
+            for (Map<String, Object> row : rows) {
+                User user = new User();
+
+                user.setId(((Long) row.get("id")));
+                user.setOusId((String) row.get("osu_id"));
+                user.setFirstName((String) row.get("first_name"));
+                user.setMiddleName((String) row.get("middle_name"));
+                user.setLastName((String) row.get("last_name"));
+                user.setEmail((String) row.get("email"));
+                user.setBusinessUnitId((Integer) row.get("business_unit_id"));
+                user.setCostCenterId((Integer) row.get("cost_center_id"));
+                user.setBusinessUnitName((String) row.get("business_unit"));
+                user.setCostCenterName((String) row.get("cost_center"));
+                user.setUrl((String) row.get("image_url"));
+                user.setTrainingAttended((boolean) row.get("attended"));
+
+                users.add(user);
+            }
+            return users;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ArrayList();
+        }
     }
 
     private ResponseEntity<Object> updateTrainingAssignment(TrainingAssignment trainingAssignment,
@@ -135,7 +169,7 @@ public class TrainingServiceImpl implements TrainingService {
     private void insertTrainingAssignment(long assignmentId, TrainingAssignment trainingAssignment,
                                           JdbcTemplate jdbcTemplate) {
         String insertTrainingAssignmentQuery = "INSERT INTO " + Constants.TABLE_TRAINING_ASSIGNMENTS +
-                " VALUES(?,?);";
+                " VALUES(?,?,0);";
 
         for (Long userId : trainingAssignment.getAssignedUserIds()) {
             jdbcTemplate.update(insertTrainingAssignmentQuery, assignmentId, userId);

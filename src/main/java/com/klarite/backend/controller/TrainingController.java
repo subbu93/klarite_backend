@@ -33,7 +33,7 @@ public class TrainingController {
         return trainingService.addTrainingAssignment(trainingAssignment, jdbcTemplate);
     }
     @GetMapping("/training/report")
-    public List<User> getAttendanceList(@RequestParam(value = "id") Long trainingId) {
-        return trainingService.getAttendanceList(jdbcTemplate);
+    public List<User> getAttendanceList(@RequestParam(value = "id") Long trainingAssignmentId) {
+        return trainingService.getAttendanceList(trainingAssignmentId, jdbcTemplate);
     }
 }

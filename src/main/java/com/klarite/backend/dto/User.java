@@ -13,6 +13,7 @@ public class User {
     private String businessUnitName;
     private String url;
     private boolean isTrainer;
+    private boolean trainingAttended;
 
     public long getId() {
         return id;
@@ -108,5 +109,13 @@ public class User {
 
     public void setTrainer(boolean trainer) {
         isTrainer = trainer;
+    }
+
+    public boolean isTrainingAttended() {
+        return trainingAttended;
+    }
+
+    public void setTrainingAttended(boolean trainingAttended) {
+        this.trainingAttended = trainingAttended;
     }
 }

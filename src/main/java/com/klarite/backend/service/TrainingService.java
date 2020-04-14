@@ -16,5 +16,5 @@ public interface TrainingService {
 
     ResponseEntity<Object> addTrainingAssignment(TrainingAssignment trainingAssignment, JdbcTemplate jdbcTemplate);
 
-    List<User> getAttendanceList(JdbcTemplate jdbcTemplate);
+    List<User> getAttendanceList(Long trainingAssignmentId, JdbcTemplate jdbcTemplate);
 }
