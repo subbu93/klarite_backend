@@ -32,4 +32,10 @@ public class UserController {
     public ResponseEntity<Object> updateEpisode(@RequestBody Episode skillEpisodes) {
         return userService.updateSkillEpisode(skillEpisodes, jdbcTemplate);
     }
+
+    @PostMapping("/user_services/mark_attendance")
+    public ResponseEntity<Object> updateEpisode(@RequestParam(value = "uuid") String uuid,
+                                                    @RequestParam(value = "userId") Long userId) {
+        return userService.markAttendance(uuid, userId, jdbcTemplate);
+    }
 }

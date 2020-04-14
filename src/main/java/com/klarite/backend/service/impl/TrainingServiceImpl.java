@@ -33,7 +33,6 @@ public class TrainingServiceImpl implements TrainingService {
                 "       INNER JOIN " + Constants.TABLE_BUSINESS_UNIT +
                 "               ON users.business_unit_id = business_unit.id " +
                 "WHERE  users.id = ? ";
-        String thresholdQuery = "SELECT * FROM " + Constants.TABLE_SKILLS + " WHERE id = ?";
 
         List<TrainingAssignment> trainingAssignments = new ArrayList<>();
 
@@ -52,6 +51,7 @@ public class TrainingServiceImpl implements TrainingService {
             obj.setAssignedUserIds(temp);
             obj.setTrainingId((Long) row.get("training_id"));
             obj.setTrainingAssignmentName((String) row.get("name"));
+            obj.setTrainingName(getTrainingName(obj.getAssignmentId(), jdbcTemplate));
 
             Map<String, Object> costCenterIdRow = jdbcTemplate.queryForMap(costCenterIdQuery, obj.getAssignedUserIds().get(0));
             Map<String, Object> businessUnitIdRow = jdbcTemplate.queryForMap(businessUnitIdQuery, obj.getAssignedUserIds().get(0));
@@ -186,5 +186,14 @@ public class TrainingServiceImpl implements TrainingService {
         String deleteSAssignmentQuery = "DELETE FROM " + Constants.TABLE_T_ASSIGNMENTS +
                 " WHERE  id = ? ";
         jdbcTemplate.update(deleteSAssignmentQuery, assignmentId);
+    }
+
+    private String getTrainingName(Long assignmentId, JdbcTemplate jdbcTemplate) {
+        String getTrainingNameQuery = "SELECT name FROM " + Constants.TABLE_TRAININGS + 
+                " WHERE  id in ( SELECT training_id FROM"+ Constants.TABLE_T_ASSIGNMENTS +
+                " WHERE id = ? )";
+        
+        Map<String, Object> row = jdbcTemplate.queryForMap(getTrainingNameQuery, assignmentId);
+        return (String) row.get("name");
     }
 }
