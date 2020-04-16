@@ -12,4 +12,5 @@ public interface UserService {
     ResponseEntity<Object> updateSkillEpisode(Episode skillEpisodes, JdbcTemplate jdbcTemplate);
     ResponseEntity<Object> markAttendance(String uuid, Long userId, JdbcTemplate jdbcTemplate);
     List<User> getAllUsers(JdbcTemplate jdbcTemplate);
+    User getUser(Long userId, JdbcTemplate jdbcTemplate);
 }

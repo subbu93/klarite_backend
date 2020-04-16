@@ -104,6 +104,41 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public User getUser(Long userId, JdbcTemplate jdbcTemplate) {
+        String query = "SELECT u.*, " +
+                "       b.NAME as business_unit, " +
+                "       c.NAME as cost_center" +
+                " FROM   "+Constants.TABLE_USERS+" AS u, " +
+                "       "+Constants.TABLE_COST_CENTER+" AS c, " +
+                "       "+ Constants.TABLE_BUSINESS_UNIT +" AS b " +
+                " WHERE  u.cost_center_id = c.id " +
+                "       AND u.business_unit_id = b.id " +
+                "       AND u.id = ?";
+        User user;
+        try {
+            Map<String, Object> row = jdbcTemplate.queryForMap(query, userId);
+
+                user = new User();
+                user.setId(((Long) row.get("id")));
+                user.setOusId((String) row.get("osu_id"));
+                user.setFirstName((String) row.get("first_name"));
+                user.setMiddleName((String) row.get("middle_name"));
+                user.setLastName((String) row.get("last_name"));
+                user.setEmail((String) row.get("email"));
+                user.setBusinessUnitId((Integer) row.get("business_unit_id"));
+                user.setCostCenterId((Integer) row.get("cost_center_id"));
+                user.setBusinessUnitName((String) row.get("business_unit"));
+                user.setCostCenterName((String) row.get("cost_center"));
+                user.setUrl((String) row.get("image_url"));
+                user.setTrainer(true);
+
+            return user;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private void insertSkillEpisodes(long episodeId, List<SkillEpisode> skillEpisodeList, JdbcTemplate jdbcTemplate) {
         deleteExisitingEPisodes(episodeId, jdbcTemplate);
         

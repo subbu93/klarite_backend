@@ -5,11 +5,13 @@ import com.klarite.backend.dto.Skill;
 import com.klarite.backend.dto.Training;
 import com.klarite.backend.dto.User;
 import com.klarite.backend.service.AdminService;
+import com.klarite.backend.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -19,13 +21,19 @@ public class AdminController {
     private AdminService adminService;
     @Autowired
     JdbcTemplate jdbcTemplate;
+    @Autowired
+    private AuthenticationService authenticationService;
 
     /*
     Skills APIs
     */
     @GetMapping("/skill_admin/get_all_skills")
-    public List<Skill> getAllSkills() {
-        return adminService.getAllSkills(jdbcTemplate);
+    public List<Skill> getAllSkills(@RequestHeader(value = "token") String token) {
+        if (authenticationService.isTokenValid(token, jdbcTemplate)) {
+            return adminService.getAllSkills(jdbcTemplate);
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     @GetMapping("/skill_admin/get_skill")

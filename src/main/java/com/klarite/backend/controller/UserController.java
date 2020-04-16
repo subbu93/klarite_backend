@@ -34,7 +34,7 @@ public class UserController {
     }
 
     @PostMapping("/user_services/mark_attendance")
-    public ResponseEntity<Object> updateEpisode(@RequestParam(value = "uuid") String uuid,
+    public ResponseEntity<Object> markAttendance(@RequestParam(value = "uuid") String uuid,
                                                     @RequestParam(value = "userId") Long userId) {
         return userService.markAttendance(uuid, userId, jdbcTemplate);
     }
