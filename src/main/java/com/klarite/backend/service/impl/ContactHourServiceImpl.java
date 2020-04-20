@@ -34,7 +34,21 @@ public class ContactHourServiceImpl implements ContactHourService {
             String query = "INSERT INTO" + Constants.TABLE_CONTACT_HOURS + "VALUES(?, ?, ?, ?, ?, ?, ?);";
             jdbcTemplate.update(query, ce.getUserId(), ce.getName(), ce.getDate(), ce.isCE(), ce.getPresenterName(),
                 ce.getTotalHours(), ce.getDescription());
-            ResponseEntity<Object> response = new ResponseEntity<>("Stored", HttpStatus.CREATED);
+            ResponseEntity<Object> response = new ResponseEntity<>(Constants.MSG_UPDATED_SUCCESSFULLY, HttpStatus.CREATED);
+            return response;
+        } catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Override
+    public ResponseEntity<Object> edit(ContinuedEducation ce, JdbcTemplate jdbcTemplate) {
+        try{
+            String query = "UPDATE" + Constants.TABLE_CONTACT_HOURS + "SET name = ?, date = ?," + 
+                           " is_ce = ?, presenter = ?, total_hours = ?, description = ? WHERE id = ?;";
+            jdbcTemplate.update(query, ce.getName(), ce.getDate(), ce.isCE(), ce.getPresenterName(), 
+                ce.getTotalHours(), ce.getDescription(), ce.getId());
+            ResponseEntity<Object> response = new ResponseEntity<>(Constants.MSG_UPDATED_SUCCESSFULLY, HttpStatus.CREATED);
             return response;
         } catch (Exception e){
             return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);

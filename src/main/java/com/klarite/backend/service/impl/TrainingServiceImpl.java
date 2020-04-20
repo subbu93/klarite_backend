@@ -141,7 +141,7 @@ public class TrainingServiceImpl implements TrainingService {
             return users;
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return new ArrayList();
+            return new ArrayList<User>();
         }
     }
 
