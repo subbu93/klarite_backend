@@ -32,4 +32,9 @@ public class ContactHourController {
     public ResponseEntity<Object> add(@RequestBody ContinuedEducation ce) {
         return contactHourService.add(ce, jdbcTemplate);
     }
+
+    @PostMapping("/ce/edit")
+    public ResponseEntity<Object> edit(@RequestBody ContinuedEducation ce) {
+        return contactHourService.edit(ce, jdbcTemplate);
+    }
 }

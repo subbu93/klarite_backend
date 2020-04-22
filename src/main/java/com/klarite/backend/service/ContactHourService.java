@@ -9,4 +9,5 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public interface ContactHourService {
     ContinuedEducationEvents getAll(Long userId, JdbcTemplate jdbcTemplate);
     ResponseEntity<Object> add(ContinuedEducation ce, JdbcTemplate jdbcTemplate);
+    ResponseEntity<Object> edit(ContinuedEducation ce, JdbcTemplate jdbcTemplate);
 }
