@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
                 User user = new User();
 
                 user.setId(((Long) row.get("id")));
-                user.setOusId((String) row.get("osu_id"));
+                user.setOsuId((String) row.get("osu_id"));
                 user.setFirstName((String) row.get("first_name"));
                 user.setMiddleName((String) row.get("middle_name"));
                 user.setLastName((String) row.get("last_name"));
@@ -94,7 +94,8 @@ public class UserServiceImpl implements UserService {
                 user.setBusinessUnitName((String) row.get("business_unit"));
                 user.setCostCenterName((String) row.get("cost_center"));
                 user.setUrl((String) row.get("image_url"));
-                user.setTrainer(true);
+                user.setRole((String) row.get("role"));
+                user.setTrainer((boolean) row.get("is_trainer"));
 
                 users.add(user);
             }
@@ -121,7 +122,7 @@ public class UserServiceImpl implements UserService {
 
                 user = new User();
                 user.setId(((Long) row.get("id")));
-                user.setOusId((String) row.get("osu_id"));
+                user.setOsuId((String) row.get("osu_id"));
                 user.setFirstName((String) row.get("first_name"));
                 user.setMiddleName((String) row.get("middle_name"));
                 user.setLastName((String) row.get("last_name"));
@@ -131,11 +132,57 @@ public class UserServiceImpl implements UserService {
                 user.setBusinessUnitName((String) row.get("business_unit"));
                 user.setCostCenterName((String) row.get("cost_center"));
                 user.setUrl((String) row.get("image_url"));
-                user.setTrainer(true);
+                user.setTrainer((boolean) row.get("is_trainer"));
+                user.setRole((String) row.get("role"));
 
             return user;
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    @Override
+    public ResponseEntity<Object> addUser(User user, JdbcTemplate jdbcTemplate) {
+        if (user.getId() != null) {
+            return updateUser(user, jdbcTemplate);
+        } else {
+            String insertUser = "INSERT INTO " + Constants.TABLE_USERS +
+                    " VALUES(?,?,?,?,?,?,?,?,?,?,?,?);";
+            try {
+                jdbcTemplate.update(insertUser, user.getOsuId(), user.getFirstName(), user.getMiddleName(),
+                        user.getLastName(), user.getEmail(), "5f4dcc3b5aa765d61d8327deb882cf99",
+                        user.getCostCenterId(), user.getBusinessUnitId(), "./image8.jpg", user.getRole(),
+                        user.isTrainer(), true);
+                return new ResponseEntity<>("Updated", HttpStatus.CREATED);
+            } catch (Exception e) {
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+        }
+    }
+
+    private ResponseEntity<Object> updateUser(User user, JdbcTemplate jdbcTemplate) {
+        String updateUser = "UPDATE " + Constants.TABLE_USERS +
+                " SET osu_id = ?" +
+                "      ,first_name = ?" +
+                "      ,middle_name = ?" +
+                "      ,last_name = ?" +
+                "      ,email = ?" +
+                "      ,cost_center_id = ?" +
+                "      ,business_unit_id = ?" +
+                "      ,image_url = ?" +
+                "      ,role = ?" +
+                "      ,is_trainer  = ?" +
+                " WHERE id = ?";
+        try {
+            jdbcTemplate.update(updateUser, user.getOsuId(), user.getFirstName(), user.getMiddleName(),
+                    user.getLastName(), user.getEmail(), user.getCostCenterId(),
+                    user.getBusinessUnitId(), "./image8.jpg", user.getRole(),
+                    user.isTrainer(), user.getId());
+
+            ResponseEntity<Object> response = new ResponseEntity<>("Updated", HttpStatus.CREATED);
+            return response;
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 

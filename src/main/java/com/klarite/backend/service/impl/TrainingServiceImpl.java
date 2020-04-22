@@ -124,7 +124,7 @@ public class TrainingServiceImpl implements TrainingService {
                 User user = new User();
 
                 user.setId(((Long) row.get("id")));
-                user.setOusId((String) row.get("osu_id"));
+                user.setOsuId((String) row.get("osu_id"));
                 user.setFirstName((String) row.get("first_name"));
                 user.setMiddleName((String) row.get("middle_name"));
                 user.setLastName((String) row.get("last_name"));

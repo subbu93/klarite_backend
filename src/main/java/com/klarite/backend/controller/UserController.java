@@ -2,12 +2,15 @@ package com.klarite.backend.controller;
 
 import com.klarite.backend.dto.Episode;
 import com.klarite.backend.dto.User;
+import com.klarite.backend.service.AuthenticationService;
 import com.klarite.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -17,6 +20,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     JdbcTemplate jdbcTemplate;
+    @Autowired
+    private AuthenticationService authenticationService;
 
     @GetMapping("/user_services/get_all_users")
     public List<User> getAllUsers(){
@@ -37,5 +42,15 @@ public class UserController {
     public ResponseEntity<Object> markAttendance(@RequestParam(value = "uuid") String uuid,
                                                     @RequestParam(value = "userId") Long userId) {
         return userService.markAttendance(uuid, userId, jdbcTemplate);
+    }
+
+    @PostMapping("/user_services/add_user")
+    public ResponseEntity<Object> addUser(@RequestHeader(value = "token") String token,
+                                          @RequestBody User user) {
+        if (authenticationService.isTokenValid(token, jdbcTemplate)) {
+            return userService.addUser(user, jdbcTemplate);
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
     }
 }

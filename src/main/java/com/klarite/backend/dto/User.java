@@ -1,8 +1,8 @@
 package com.klarite.backend.dto;
 
 public class User {
-    private long id;
-    private String ousId;
+    private Long id;
+    private String osuId;
     private String firstName;
     private String middleName;
     private String lastName;
@@ -15,21 +15,22 @@ public class User {
     private boolean isTrainer;
     private boolean trainingAttended;
     private String token;
+    private String role;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getOusId() {
-        return ousId;
+    public String getOsuId() {
+        return osuId;
     }
 
-    public void setOusId(String ousId) {
-        this.ousId = ousId;
+    public void setOsuId(String osuId) {
+        this.osuId = osuId;
     }
 
     public String getFirstName() {
@@ -126,5 +127,13 @@ public class User {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

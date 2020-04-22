@@ -1,10 +1,8 @@
 package com.klarite.backend.controller;
 
 import com.klarite.backend.dto.Login;
-import com.klarite.backend.dto.User;
 import com.klarite.backend.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
