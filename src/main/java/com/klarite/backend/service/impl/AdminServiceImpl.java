@@ -26,7 +26,7 @@ public class AdminServiceImpl implements AdminService {
                 "      ,sk.threshold" +
                 "      ,t.name as training_prerequisite" +
                 "      ,t.id as training_id" +
-                "  FROM "+ Constants.TABLE_SKILLS + " as sk, "+Constants.TABLE_TRAININGS+" as t" +
+                "  FROM " + Constants.TABLE_SKILLS + " as sk, " + Constants.TABLE_TRAININGS + " as t" +
                 "  WHERE t.id = sk.training_prerequisite_id " +
                 "  AND sk.soft_delete = 0";
         List<Skill> skills = new ArrayList<>();
@@ -56,7 +56,7 @@ public class AdminServiceImpl implements AdminService {
                 "      ,t.name as Training_prerequisite" +
                 "      ,t.id as training_id" +
                 "     FROM skills as sk, trainings as t" +
-                "     WHERE sk.id = "+ id +" AND " +
+                "     WHERE sk.id = " + id + " AND " +
                 "      t.id = sk.training_prerequisite_id" +
                 "      AND sk.soft_delete = 0";
 
@@ -112,8 +112,8 @@ public class AdminServiceImpl implements AdminService {
         String query = "UPDATE " + Constants.TABLE_SKILLS +
                 " SET soft_delete = 1 " +
                 " WHERE id = ?";
-        try{
-            jdbcTemplate.update(query,skillId);
+        try {
+            jdbcTemplate.update(query, skillId);
             return new ResponseEntity<>("Deleted Skill", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -125,10 +125,10 @@ public class AdminServiceImpl implements AdminService {
         String query = "SELECT tr.*, " +
                 "       u.first_name, " +
                 "       u.last_name " +
-                "FROM   "+Constants.TABLE_TRAININGS+" AS tr, " +
-                "       "+Constants.TABLE_USERS+" AS u " +
+                "FROM   " + Constants.TABLE_TRAININGS + " AS tr, " +
+                "       " + Constants.TABLE_USERS + " AS u " +
                 "WHERE  tr.trainer_id = u.id " +
-                "AND tr.soft_delete = "+Constants.ZERO;
+                "AND tr.soft_delete = " + Constants.ZERO;
 
         List<Training> trainings = new ArrayList<>();
 
@@ -156,11 +156,11 @@ public class AdminServiceImpl implements AdminService {
         String query = "SELECT tr.*, " +
                 "       u.first_name, " +
                 "       u.last_name " +
-                "FROM   "+Constants.TABLE_TRAININGS+" AS tr, " +
-                "       "+Constants.TABLE_USERS+" AS u " +
-                "WHERE  tr.id = "+ trainingId +
+                "FROM   " + Constants.TABLE_TRAININGS + " AS tr, " +
+                "       " + Constants.TABLE_USERS + " AS u " +
+                "WHERE  tr.id = " + trainingId +
                 "AND tr.trainer_id = u.id " +
-                "AND tr.soft_delete = "+Constants.ZERO;
+                "AND tr.soft_delete = " + Constants.ZERO;
 
         Map<String, Object> row = jdbcTemplate.queryForMap(query);
         Training training = new Training();
@@ -185,7 +185,7 @@ public class AdminServiceImpl implements AdminService {
                 " FROM   users AS u, " +
                 "       cost_center AS c, " +
                 "       business_unit AS b " +
-                " WHERE  u.is_trainer = " +Constants.ONE+
+                " WHERE  u.is_trainer = " + Constants.ONE +
                 "       AND u.cost_center_id = c.id " +
                 "       AND u.business_unit_id = b.id ";
 
@@ -256,8 +256,8 @@ public class AdminServiceImpl implements AdminService {
         String query = "UPDATE " + Constants.TABLE_TRAININGS +
                 " SET soft_delete = 1 " +
                 " WHERE id = ?";
-        try{
-            jdbcTemplate.update(query,trainingId);
+        try {
+            jdbcTemplate.update(query, trainingId);
             return new ResponseEntity<>("Deleted Skill", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -299,7 +299,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public ContactHours getCeHrs(String state, String title, String position, JdbcTemplate jdbcTemplate) {
         ContactHours ce = new ContactHours();
-        if(state == null || title == null || position == null){
+        if (state == null || title == null || position == null) {
             return null;
         }
         String query = "SELECT * FROM " + Constants.TABLE_CONTINUED_EDUCATION +

@@ -19,6 +19,7 @@ public class AuthenticationController {
     public ResponseEntity<Object> login(@RequestBody Login loginDetails) {
         return authenticationService.login(loginDetails.getUsername(), loginDetails.getPassword(), jdbcTemplate);
     }
+
     @PostMapping("/logout")
     public ResponseEntity<Object> logout(@RequestHeader(value = "token") String token) {
         return authenticationService.logout(token, jdbcTemplate);

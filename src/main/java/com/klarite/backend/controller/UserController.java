@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -24,7 +23,7 @@ public class UserController {
     private AuthenticationService authenticationService;
 
     @GetMapping("/user_services/get_all_users")
-    public List<User> getAllUsers(){
+    public List<User> getAllUsers() {
         return userService.getAllUsers(jdbcTemplate);
     }
 
@@ -40,7 +39,7 @@ public class UserController {
 
     @PostMapping("/user_services/mark_attendance")
     public ResponseEntity<Object> markAttendance(@RequestParam(value = "uuid") String uuid,
-                                                    @RequestParam(value = "userId") Long userId) {
+                                                 @RequestParam(value = "userId") Long userId) {
         return userService.markAttendance(uuid, userId, jdbcTemplate);
     }
 

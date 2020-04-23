@@ -37,7 +37,7 @@ public class AdminController {
     }
 
     @GetMapping("/skill_admin/get_skill")
-    public Skill getSkill(@RequestParam(value = "id") long id){
+    public Skill getSkill(@RequestParam(value = "id") long id) {
         return adminService.getSkill(id, jdbcTemplate);
     }
 
@@ -61,7 +61,7 @@ public class AdminController {
 
     @GetMapping("/skill_admin/get_training")
     public Training getTraining(@RequestParam(value = "id") long trainingId) {
-        return adminService.getTraining(trainingId,jdbcTemplate);
+        return adminService.getTraining(trainingId, jdbcTemplate);
     }
 
     @GetMapping("/skill_admin/get_trainer")

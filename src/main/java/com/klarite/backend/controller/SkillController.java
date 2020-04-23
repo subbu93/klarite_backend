@@ -2,7 +2,6 @@ package com.klarite.backend.controller;
 
 import com.klarite.backend.dto.*;
 import com.klarite.backend.service.SkillService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -45,7 +44,7 @@ public class SkillController {
 
     @GetMapping("/skill/get_all_episodes")
     public List<Episode> getAllEpisodes(@RequestParam(value = "userId") long userId,
-                                              @RequestParam(value = "skillId") long skillId) {
+                                        @RequestParam(value = "skillId") long skillId) {
         return skillService.getAllEpisodes(userId, skillId, jdbcTemplate);
     }
 

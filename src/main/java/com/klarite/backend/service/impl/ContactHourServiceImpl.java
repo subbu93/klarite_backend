@@ -1,20 +1,19 @@
 package com.klarite.backend.service.impl;
 
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import com.klarite.backend.Constants;
 import com.klarite.backend.dto.ContinuedEducation;
 import com.klarite.backend.dto.ContinuedEducationEvents;
 import com.klarite.backend.dto.Training;
 import com.klarite.backend.service.ContactHourService;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class ContactHourServiceImpl implements ContactHourService {
@@ -30,37 +29,37 @@ public class ContactHourServiceImpl implements ContactHourService {
 
     @Override
     public ResponseEntity<Object> add(ContinuedEducation ce, JdbcTemplate jdbcTemplate) {
-        try{
+        try {
             String query = "INSERT INTO" + Constants.TABLE_CONTACT_HOURS + "VALUES(?, ?, ?, ?, ?, ?, ?);";
             jdbcTemplate.update(query, ce.getUserId(), ce.getName(), ce.getDate(), ce.isCE(), ce.getPresenterName(),
-                ce.getTotalHours(), ce.getDescription());
+                    ce.getTotalHours(), ce.getDescription());
             ResponseEntity<Object> response = new ResponseEntity<>(Constants.MSG_UPDATED_SUCCESSFULLY, HttpStatus.CREATED);
             return response;
-        } catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     @Override
     public ResponseEntity<Object> edit(ContinuedEducation ce, JdbcTemplate jdbcTemplate) {
-        try{
-            String query = "UPDATE" + Constants.TABLE_CONTACT_HOURS + "SET name = ?, date = ?," + 
-                           " is_ce = ?, presenter = ?, total_hours = ?, description = ? WHERE id = ?;";
-            jdbcTemplate.update(query, ce.getName(), ce.getDate(), ce.isCE(), ce.getPresenterName(), 
-                ce.getTotalHours(), ce.getDescription(), ce.getId());
+        try {
+            String query = "UPDATE" + Constants.TABLE_CONTACT_HOURS + "SET name = ?, date = ?," +
+                    " is_ce = ?, presenter = ?, total_hours = ?, description = ? WHERE id = ?;";
+            jdbcTemplate.update(query, ce.getName(), ce.getDate(), ce.isCE(), ce.getPresenterName(),
+                    ce.getTotalHours(), ce.getDescription(), ce.getId());
             ResponseEntity<Object> response = new ResponseEntity<>(Constants.MSG_UPDATED_SUCCESSFULLY, HttpStatus.CREATED);
             return response;
-        } catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     private List<Training> getTrainingsWithCE(Long userId, JdbcTemplate jdbcTemplate) {
         List<Training> trainings = new ArrayList<>();
-        String query = "SELECT * FROM " + Constants.TABLE_TRAININGS + 
-                       " WHERE is_ce = 1 AND soft_delete = 0 AND id IN (SELECT training_id FROM "
-                       + Constants.TABLE_T_ASSIGNMENTS + " WHERE id IN (SELECT assignment_id FROM "
-                       + Constants.TABLE_TRAINING_ASSIGNMENTS + " WHERE user_id = ? and attended = 1));";
+        String query = "SELECT * FROM " + Constants.TABLE_TRAININGS +
+                " WHERE is_ce = 1 AND soft_delete = 0 AND id IN (SELECT training_id FROM "
+                + Constants.TABLE_T_ASSIGNMENTS + " WHERE id IN (SELECT assignment_id FROM "
+                + Constants.TABLE_TRAINING_ASSIGNMENTS + " WHERE user_id = ? and attended = 1));";
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, userId);
         for (Map<String, Object> row : rows) {
             Training obj = new Training();
@@ -80,8 +79,8 @@ public class ContactHourServiceImpl implements ContactHourService {
 
     private List<ContinuedEducation> getEducationWithCE(Long userId, JdbcTemplate jdbcTemplate) {
         List<ContinuedEducation> educations = new ArrayList<>();
-        String query = "SELECT * FROM " + Constants.TABLE_CONTACT_HOURS + 
-                       " WHERE is_ce = 1 AND user_id = ?;";
+        String query = "SELECT * FROM " + Constants.TABLE_CONTACT_HOURS +
+                " WHERE is_ce = 1 AND user_id = ?;";
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, userId);
         for (Map<String, Object> row : rows) {
             ContinuedEducation obj = new ContinuedEducation();

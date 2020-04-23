@@ -32,6 +32,7 @@ public class TrainingController {
     public ResponseEntity<Object> addTrainingAssignment(@RequestBody TrainingAssignment trainingAssignment) {
         return trainingService.addTrainingAssignment(trainingAssignment, jdbcTemplate);
     }
+
     @GetMapping("/training/report")
     public List<User> getAttendanceList(@RequestParam(value = "id") Long trainingAssignmentId) {
         return trainingService.getAttendanceList(trainingAssignmentId, jdbcTemplate);

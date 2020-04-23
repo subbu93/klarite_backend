@@ -49,7 +49,7 @@ public class TrainingAssignment {
     }
 
     public void setCostCenter(String costCenter) {
-        this.costCenter = costCenter;   
+        this.costCenter = costCenter;
     }
 
     public Long getTrainingId() {

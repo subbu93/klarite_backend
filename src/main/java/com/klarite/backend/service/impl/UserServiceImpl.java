@@ -20,15 +20,15 @@ import java.util.Map;
 public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<Object> addSkillEpisode(Episode episode, JdbcTemplate jdbcTemplate) {
-        try{
+        try {
             String query = "INSERT INTO" + Constants.TABLE_EPISODES + "VALUES(?, ?, ?, ?); SELECT SCOPE_IDENTITY() as id;";
-            Map<String, Object> row = jdbcTemplate.queryForMap(query, episode.getUserId(), episode.getDate(), 
-                episode.getMrn(), episode.isAudited());
+            Map<String, Object> row = jdbcTemplate.queryForMap(query, episode.getUserId(), episode.getDate(),
+                    episode.getMrn(), episode.isAudited());
             BigDecimal episodeId = (BigDecimal) row.get("id");
             insertSkillEpisodes(episodeId.longValue(), episode.getEpisodes(), jdbcTemplate);
             return new ResponseEntity<>("Stored", HttpStatus.CREATED);
-        } catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -46,19 +46,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<Object> markAttendance(String uuid, Long userId, JdbcTemplate jdbcTemplate) {
-        try{
+        try {
             Long trainingAssignmentId = isUUIDValid(uuid, jdbcTemplate);
             if (trainingAssignmentId != null) {
                 if (isTimeValid(trainingAssignmentId, jdbcTemplate)) {
-                    String query = "UPDATE " + Constants.TABLE_TRAINING_ASSIGNMENTS + 
-                                " SET attended = 1 WHERE uuid = ? and user_id = ?";
+                    String query = "UPDATE " + Constants.TABLE_TRAINING_ASSIGNMENTS +
+                            " SET attended = 1 WHERE uuid = ? and user_id = ?";
                     jdbcTemplate.update(query, trainingAssignmentId, userId);
                     return new ResponseEntity<>(Constants.MSG_MARK_ATTENDANCE_SUCCESS, HttpStatus.OK);
-                }
-                else
+                } else
                     return new ResponseEntity<>(Constants.MSG_MARK_ATTENDANCE_INVALID_TIME, HttpStatus.BAD_REQUEST);
-            }
-            else
+            } else
                 return new ResponseEntity<>(Constants.MSG_MARK_ATTENDANCE_INVALID_UUID, HttpStatus.BAD_REQUEST);
 
         } catch (Exception e) {
@@ -71,9 +69,9 @@ public class UserServiceImpl implements UserService {
         String query = "SELECT u.*, " +
                 "       b.NAME as business_unit, " +
                 "       c.NAME as cost_center" +
-                " FROM   "+Constants.TABLE_USERS+" AS u, " +
-                "       "+Constants.TABLE_COST_CENTER+" AS c, " +
-                "       "+ Constants.TABLE_BUSINESS_UNIT +" AS b " +
+                " FROM   " + Constants.TABLE_USERS + " AS u, " +
+                "       " + Constants.TABLE_COST_CENTER + " AS c, " +
+                "       " + Constants.TABLE_BUSINESS_UNIT + " AS b " +
                 " WHERE  u.cost_center_id = c.id " +
                 "       AND u.business_unit_id = b.id ";
         List<User> users;
@@ -110,9 +108,9 @@ public class UserServiceImpl implements UserService {
         String query = "SELECT u.*, " +
                 "       b.NAME as business_unit, " +
                 "       c.NAME as cost_center" +
-                " FROM   "+Constants.TABLE_USERS+" AS u, " +
-                "       "+Constants.TABLE_COST_CENTER+" AS c, " +
-                "       "+ Constants.TABLE_BUSINESS_UNIT +" AS b " +
+                " FROM   " + Constants.TABLE_USERS + " AS u, " +
+                "       " + Constants.TABLE_COST_CENTER + " AS c, " +
+                "       " + Constants.TABLE_BUSINESS_UNIT + " AS b " +
                 " WHERE  u.cost_center_id = c.id " +
                 "       AND u.business_unit_id = b.id " +
                 "       AND u.id = ?";
@@ -120,20 +118,20 @@ public class UserServiceImpl implements UserService {
         try {
             Map<String, Object> row = jdbcTemplate.queryForMap(query, userId);
 
-                user = new User();
-                user.setId(((Long) row.get("id")));
-                user.setOsuId((String) row.get("osu_id"));
-                user.setFirstName((String) row.get("first_name"));
-                user.setMiddleName((String) row.get("middle_name"));
-                user.setLastName((String) row.get("last_name"));
-                user.setEmail((String) row.get("email"));
-                user.setBusinessUnitId((Integer) row.get("business_unit_id"));
-                user.setCostCenterId((Integer) row.get("cost_center_id"));
-                user.setBusinessUnitName((String) row.get("business_unit"));
-                user.setCostCenterName((String) row.get("cost_center"));
-                user.setUrl((String) row.get("image_url"));
-                user.setTrainer((boolean) row.get("is_trainer"));
-                user.setRole((String) row.get("role"));
+            user = new User();
+            user.setId(((Long) row.get("id")));
+            user.setOsuId((String) row.get("osu_id"));
+            user.setFirstName((String) row.get("first_name"));
+            user.setMiddleName((String) row.get("middle_name"));
+            user.setLastName((String) row.get("last_name"));
+            user.setEmail((String) row.get("email"));
+            user.setBusinessUnitId((Integer) row.get("business_unit_id"));
+            user.setCostCenterId((Integer) row.get("cost_center_id"));
+            user.setBusinessUnitName((String) row.get("business_unit"));
+            user.setCostCenterName((String) row.get("cost_center"));
+            user.setUrl((String) row.get("image_url"));
+            user.setTrainer((boolean) row.get("is_trainer"));
+            user.setRole((String) row.get("role"));
 
             return user;
         } catch (Exception e) {
@@ -188,7 +186,7 @@ public class UserServiceImpl implements UserService {
 
     private void insertSkillEpisodes(long episodeId, List<SkillEpisode> skillEpisodeList, JdbcTemplate jdbcTemplate) {
         deleteExisitingEPisodes(episodeId, jdbcTemplate);
-        
+
         String query = "INSERT INTO" + Constants.TABLE_SKILL_EPISODES + "VALUES(?, ?, ?, ?);";
         for (SkillEpisode skillEpisode : skillEpisodeList) {
             if (!skillEpisode.isObserved() || skillEpisode.getObserverId() == 0)

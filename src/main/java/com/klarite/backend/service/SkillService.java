@@ -1,13 +1,14 @@
 package com.klarite.backend.service;
 
-import java.util.List;
-
 import com.klarite.backend.dto.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.util.List;
+
 public interface SkillService {
     List<Episode> getAllEpisodes(Long userId, Long skillId, JdbcTemplate jdbcTemplate);
+
     Episode getEpisode(Long episodeId, JdbcTemplate jdbcTemplate);
 
     List<SkillAssignment> getAllAssignedSkills(JdbcTemplate jdbcTemplate);

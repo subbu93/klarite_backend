@@ -40,7 +40,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public Boolean isTokenValid(String token, JdbcTemplate jdbcTemplate) {
-        String query = "SELECT count(1) AS count FROM " + Constants.TABLE_TOKENS+
+        String query = "SELECT count(1) AS count FROM " + Constants.TABLE_TOKENS +
                 "WHERE token = ? ;";
 
         Map<String, Object> row = jdbcTemplate.queryForMap(query, token);

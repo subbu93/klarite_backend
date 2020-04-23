@@ -109,9 +109,9 @@ public class TrainingServiceImpl implements TrainingService {
     @Override
     public List<User> getAttendanceList(Long trainingAssignmentId, JdbcTemplate jdbcTemplate) {
         String query = "SELECT * " +
-                "FROM   "+Constants.TABLE_USERS+" AS u " +
+                "FROM   " + Constants.TABLE_USERS + " AS u " +
                 "       INNER JOIN (SELECT * " +
-                "                   FROM " + Constants.TABLE_TRAINING_ASSIGNMENTS+
+                "                   FROM " + Constants.TABLE_TRAINING_ASSIGNMENTS +
                 "                   WHERE  assignment_id = ?) AS t1 " +
                 "               ON u.id = t1.user_id ";
 
@@ -189,10 +189,10 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     private String getTrainingName(Long assignmentId, JdbcTemplate jdbcTemplate) {
-        String getTrainingNameQuery = "SELECT name FROM " + Constants.TABLE_TRAININGS + 
-                " WHERE  id in ( SELECT training_id FROM"+ Constants.TABLE_T_ASSIGNMENTS +
+        String getTrainingNameQuery = "SELECT name FROM " + Constants.TABLE_TRAININGS +
+                " WHERE  id in ( SELECT training_id FROM" + Constants.TABLE_T_ASSIGNMENTS +
                 " WHERE id = ? )";
-        
+
         Map<String, Object> row = jdbcTemplate.queryForMap(getTrainingNameQuery, assignmentId);
         return (String) row.get("name");
     }
