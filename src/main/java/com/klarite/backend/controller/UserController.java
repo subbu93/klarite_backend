@@ -52,4 +52,9 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
+
+    @GetMapping("/user_services/get_user_data")
+    public User getUserData(@RequestParam(value = "userId") Long userId) {
+        return userService.getUser(userId, true, jdbcTemplate);
+    }
 }

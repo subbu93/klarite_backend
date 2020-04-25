@@ -22,6 +22,11 @@ public class ContactHourController {
         return contactHourService.getAll(userId, jdbcTemplate);
     }
 
+    @GetMapping("/ce/get")
+    public ContinuedEducation get(@RequestParam(value = "id") long id) {
+        return contactHourService.get(id, jdbcTemplate);
+    }
+
     @PostMapping("/ce/add")
     public ResponseEntity<Object> add(@RequestBody ContinuedEducation ce) {
         return contactHourService.add(ce, jdbcTemplate);

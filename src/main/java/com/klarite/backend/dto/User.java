@@ -16,6 +16,7 @@ public class User {
     private boolean trainingAttended;
     private String token;
     private String role;
+    private String imageData;
 
     public Long getId() {
         return id;
@@ -135,5 +136,13 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getImageData() {
+        return imageData;
+    }
+
+    public void setImageData(String imageData) {
+        this.imageData = imageData;
     }
 }

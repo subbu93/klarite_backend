@@ -26,4 +26,9 @@ public class Constants {
     public static final String MSG_MARK_ATTENDANCE_INVALID_TIME = "Failed to mark attendance. Reason: 'Inavlid time'.";
     public static final String MSG_UPDATED_SUCCESSFULLY = "Data updated successfully.";
     public static final String MSG_UPDATE_FAILED = "Failed to update data.";
+
+    // directories
+    public static final String DIRECTORY_UPLOADS = "uploads";
+    public static final String DIRECTORY_PROFILE = DIRECTORY_UPLOADS + "/" + "profile";
+    public static final String DIRECTORY_DOCUMENTS = DIRECTORY_UPLOADS + "/" + "documents";
 }

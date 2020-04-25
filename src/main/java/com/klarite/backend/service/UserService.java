@@ -18,5 +18,7 @@ public interface UserService {
 
     User getUser(Long userId, JdbcTemplate jdbcTemplate);
 
+    User getUser(Long userId, Boolean getImageData, JdbcTemplate jdbcTemplate);
+
     ResponseEntity<Object> addUser(User user, JdbcTemplate jdbcTemplate);
 }

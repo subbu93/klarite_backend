@@ -5,14 +5,19 @@ import com.klarite.backend.dto.Episode;
 import com.klarite.backend.dto.SkillEpisode;
 import com.klarite.backend.dto.User;
 import com.klarite.backend.service.UserService;
+
+import org.apache.commons.io.FileUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.math.BigDecimal;
+import java.nio.file.Paths;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -101,6 +106,18 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             return new ArrayList<>();
         }
+    }
+
+    public User getUser(Long userId, Boolean getImageData, JdbcTemplate jdbcTemplate) {
+        User usr = getUser(userId, jdbcTemplate);
+        try {   
+            String imagePath = Paths.get(Constants.DIRECTORY_PROFILE, usr.getUrl()).toAbsolutePath().toString();
+            byte[] fileContent = FileUtils.readFileToByteArray(new File(imagePath));
+            usr.setImageData(Base64.getEncoder().encodeToString(fileContent));     
+        } catch (Exception e) {
+            // todo: print error
+        }
+        return usr;
     }
 
     @Override

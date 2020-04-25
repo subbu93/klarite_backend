@@ -12,6 +12,8 @@ public class ContinuedEducation {
     private String presenterName;
     private Float totalHours;
     private String description;
+    private String url;
+    private String imageData;
 
     public Long getId() {
         return id;
@@ -75,5 +77,21 @@ public class ContinuedEducation {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getImageData() {
+        return imageData;
+    }
+
+    public void setImageData(String imageData) {
+        this.imageData = imageData;
     }
 }
