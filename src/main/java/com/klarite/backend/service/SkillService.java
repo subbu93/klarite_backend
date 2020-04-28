@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SkillService {
     List<Episode> getAllEpisodes(Long userId, Long skillId, JdbcTemplate jdbcTemplate);
@@ -22,4 +23,6 @@ public interface SkillService {
     ResponseEntity<Object> addSkillAssignment(SkillAssignment skillAssignment, JdbcTemplate jdbcTemplate);
 
     List<Skill> getAssignedSkills(Long userId, JdbcTemplate jdbcTemplate);
+
+    Map<Long, List<Skill>> getAnalysisData(Long businessUnitId, Long costCenterId, JdbcTemplate jdbcTemplate);
 }

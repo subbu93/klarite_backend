@@ -73,12 +73,13 @@ public class UserServiceImpl implements UserService {
     public List<User> getAllUsers(JdbcTemplate jdbcTemplate) {
         String query = "SELECT u.*, " +
                 "       b.NAME as business_unit, " +
-                "       c.NAME as cost_center" +
+                "       c.NAME as cost_center " +
                 " FROM   " + Constants.TABLE_USERS + " AS u, " +
                 "       " + Constants.TABLE_COST_CENTER + " AS c, " +
                 "       " + Constants.TABLE_BUSINESS_UNIT + " AS b " +
                 " WHERE  u.cost_center_id = c.id " +
-                "       AND u.business_unit_id = b.id ";
+                "       AND u.business_unit_id = b.id " +
+                "       AND u.soft_delete = 0;";
         List<User> users;
         try {
             users = new ArrayList<>();
@@ -130,7 +131,8 @@ public class UserServiceImpl implements UserService {
                 "       " + Constants.TABLE_BUSINESS_UNIT + " AS b " +
                 " WHERE  u.cost_center_id = c.id " +
                 "       AND u.business_unit_id = b.id " +
-                "       AND u.id = ?";
+                "       AND u.id = ?" +
+                "       AND u.soft_delete = 0";
         User user;
         try {
             Map<String, Object> row = jdbcTemplate.queryForMap(query, userId);
@@ -162,7 +164,7 @@ public class UserServiceImpl implements UserService {
             return updateUser(user, jdbcTemplate);
         } else {
             String insertUser = "INSERT INTO " + Constants.TABLE_USERS +
-                    " VALUES(?,?,?,?,?,?,?,?,?,?,?,?);";
+                    " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,0);";
             try {
                 jdbcTemplate.update(insertUser, user.getOsuId(), user.getFirstName(), user.getMiddleName(),
                         user.getLastName(), user.getEmail(), "5f4dcc3b5aa765d61d8327deb882cf99",
@@ -172,6 +174,19 @@ public class UserServiceImpl implements UserService {
             } catch (Exception e) {
                 return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
             }
+        }
+    }
+
+    @Override
+    public ResponseEntity<Object> deleteUser(Long userId, JdbcTemplate jdbcTemplate) {
+        String query = "UPDATE " + Constants.TABLE_USERS +
+                " SET soft_delete = 1 " +
+                " WHERE id = ?";
+        try {
+            jdbcTemplate.update(query, userId);
+            return new ResponseEntity<>("Deleted User", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 

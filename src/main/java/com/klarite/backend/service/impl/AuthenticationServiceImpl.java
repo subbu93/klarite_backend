@@ -20,7 +20,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String query = "SELECT id AS userId " +
                 " FROM " + Constants.TABLE_USERS +
                 " WHERE  email = ? " +
-                "       AND password = ?;";
+                "       AND password = ?" +
+                "       AND soft_delete = 0;";
         User user;
         ResponseEntity<Object> response;
         try {

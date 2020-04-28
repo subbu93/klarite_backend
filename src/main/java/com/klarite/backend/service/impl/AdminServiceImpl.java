@@ -156,11 +156,12 @@ public class AdminServiceImpl implements AdminService {
         String query = "SELECT tr.*, " +
                 "       u.first_name, " +
                 "       u.last_name " +
-                "FROM   " + Constants.TABLE_TRAININGS + " AS tr, " +
+                " FROM   " + Constants.TABLE_TRAININGS + " AS tr, " +
                 "       " + Constants.TABLE_USERS + " AS u " +
-                "WHERE  tr.id = " + trainingId +
-                "AND tr.trainer_id = u.id " +
-                "AND tr.soft_delete = " + Constants.ZERO;
+                " WHERE  tr.id = " + trainingId +
+                " AND tr.trainer_id = u.id " +
+                " AND tr.soft_delete = " + Constants.ZERO +
+                " AND u.soft_delete = "+ Constants.ZERO;
 
         Map<String, Object> row = jdbcTemplate.queryForMap(query);
         Training training = new Training();

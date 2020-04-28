@@ -53,6 +53,11 @@ public class UserController {
         }
     }
 
+    @DeleteMapping("/user_services/delete_user")
+    public ResponseEntity<Object> deleteUser(@RequestParam(value = "id") Long userId) {
+        return userService.deleteUser(userId, jdbcTemplate);
+    }
+
     @GetMapping("/user_services/get_user_data")
     public User getUserData(@RequestParam(value = "userId") Long userId) {
         return userService.getUser(userId, true, jdbcTemplate);

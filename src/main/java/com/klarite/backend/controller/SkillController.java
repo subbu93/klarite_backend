@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -56,5 +57,11 @@ public class SkillController {
     @GetMapping("/skill/get_assigned_skills")
     public List<Skill> getAssignedSkills(@RequestParam(required = false, value = "userId") Long userId) {
         return skillService.getAssignedSkills(userId, jdbcTemplate);
+    }
+
+    @GetMapping("/skill/get-analysis-data")
+    public Map<Long, List<Skill>> getAnalysisData(@RequestParam(value = "businessUnitId") Long businessUnitId,
+                                                     @RequestParam(value = "costCenterId") Long costCenterId) {
+        return skillService.getAnalysisData(businessUnitId, costCenterId, jdbcTemplate);
     }
 }

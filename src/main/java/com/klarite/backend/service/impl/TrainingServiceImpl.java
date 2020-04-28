@@ -27,12 +27,14 @@ public class TrainingServiceImpl implements TrainingService {
                 "FROM   " + Constants.TABLE_USERS +
                 "       INNER JOIN " + Constants.TABLE_COST_CENTER +
                 "               ON users.cost_center_id = cost_center.id " +
-                "WHERE  users.id = ? ";
+                "WHERE  users.id = ? " +
+                "       AND soft_delete = 0;";
         String businessUnitIdQuery = "SELECT business_unit.* " +
                 "FROM   " + Constants.TABLE_USERS +
                 "       INNER JOIN " + Constants.TABLE_BUSINESS_UNIT +
                 "               ON users.business_unit_id = business_unit.id " +
-                "WHERE  users.id = ? ";
+                "WHERE  users.id = ? " +
+                "       AND soft_delete = 0;";
 
         List<TrainingAssignment> trainingAssignments = new ArrayList<>();
 
@@ -113,7 +115,8 @@ public class TrainingServiceImpl implements TrainingService {
                 "       INNER JOIN (SELECT * " +
                 "                   FROM " + Constants.TABLE_TRAINING_ASSIGNMENTS +
                 "                   WHERE  assignment_id = ?) AS t1 " +
-                "               ON u.id = t1.user_id ";
+                "               ON u.id = t1.user_id " +
+                " WHERE  soft_delete = 0; ";
 
         List<User> users;
         try {

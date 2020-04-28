@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,10 +24,11 @@ public class SkillServiceImpl implements SkillService {
         String skillAssignmentQuery = "SELECT * FROM " + Constants.TABLE_SKILL_ASSIGNMENTS +
                 " WHERE assignment_id = ?";
         String costCenterIdQuery = "SELECT cost_center.* " +
-                "FROM   " + Constants.TABLE_USERS +
+                "FROM   " + Constants.TABLE_USERS + " AS u " +
                 "       INNER JOIN " + Constants.TABLE_COST_CENTER +
                 "               ON users.cost_center_id = cost_center.id " +
-                "WHERE  users.id = ? ";
+                "WHERE  u.id = ?" +
+                "       AND u.soft_delete = 0;";
 
         List<SkillAssignment> skillAssignments = new ArrayList<>();
 
@@ -161,6 +163,30 @@ public class SkillServiceImpl implements SkillService {
         } catch (Exception e) {
             return new ArrayList<>();
         }
+    }
+
+    @Override
+    public Map<Long, List<Skill>> getAnalysisData(Long businessUnitId,
+                                                  Long costCenterId,
+                                                  JdbcTemplate jdbcTemplate) {
+        String getUserFromCostCenterQuery = "SELECT id " +
+                " FROM "+ Constants.TABLE_USERS +
+                " WHERE  cost_center_id = ? " +
+                "       AND business_unit_id = ?" +
+                "       AND soft_delete = 0;";
+        Map<Long, List<Skill>> assignedSkillsForAllUsers;
+        try {
+            assignedSkillsForAllUsers = new HashMap<>();
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(getUserFromCostCenterQuery,
+                    costCenterId, businessUnitId);
+            for (Map<String, Object> row : rows) {
+                List<Skill> assignedSkillForEachUser = getAssignedSkills((Long) row.get("id"), jdbcTemplate);
+                assignedSkillsForAllUsers.put((Long) row.get("id"), assignedSkillForEachUser);
+            }
+        } catch (Exception e) {
+            return new HashMap<>();
+        }
+        return assignedSkillsForAllUsers;
     }
 
     private ResponseEntity<Object> updateSkillAssignment(SkillAssignment skillAssignment, JdbcTemplate jdbcTemplate) {
