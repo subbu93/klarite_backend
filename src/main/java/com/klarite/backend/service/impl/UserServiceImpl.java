@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
             Map<String, Object> row = jdbcTemplate.queryForMap(query, episode.getUserId(), episode.getDate(),
                     episode.getMrn(), episode.isAudited());
             BigDecimal episodeId = (BigDecimal) row.get("id");
-            insertSkillEpisodes(episodeId.longValue(), episode.getEpisodes(), jdbcTemplate);
+            insertSkillEpisodes(episode.getUserId(), episodeId.longValue(), episode.getEpisodes(), jdbcTemplate);
             return new ResponseEntity<>("Stored", HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
         try {
             String query = "UPDATE" + Constants.TABLE_EPISODES + "SET date = ?, mrn = ?, is_audited = ? WHERE id = ?;";
             jdbcTemplate.update(query, episode.getDate(), episode.getMrn(), episode.isAudited(), episode.getId());
-            insertSkillEpisodes(episode.getId().longValue(), episode.getEpisodes(), jdbcTemplate);
+            insertSkillEpisodes(episode.getUserId(), episode.getId().longValue(), episode.getEpisodes(), jdbcTemplate);
             return new ResponseEntity<>("Updated", HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -201,19 +201,28 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private void insertSkillEpisodes(long episodeId, List<SkillEpisode> skillEpisodeList, JdbcTemplate jdbcTemplate) {
-        deleteExisitingEPisodes(episodeId, jdbcTemplate);
+    private void insertSkillEpisodes(Long userId, long episodeId, List<SkillEpisode> skillEpisodeList, JdbcTemplate jdbcTemplate) {
+        deleteExisitingEpisodes(episodeId, jdbcTemplate);
 
         String query = "INSERT INTO" + Constants.TABLE_SKILL_EPISODES + "VALUES(?, ?, ?, ?);";
         for (SkillEpisode skillEpisode : skillEpisodeList) {
             if (!skillEpisode.isObserved() || skillEpisode.getObserverId() == 0)
                 jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(), skillEpisode.isObserved(), null);
             else
+            {
                 jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(), skillEpisode.isObserved(), skillEpisode.getObserverId());
+                
+                query = "INSERT INTO" + Constants.TABLE_NOTIFICATIONS + "VALUES(?); SELECT SCOPE_IDENTITY() as id;";
+                Map<String, Object> row = jdbcTemplate.queryForMap(query, true);
+                BigDecimal notification_id = (BigDecimal) row.get("id");
+                User usr = getUser(userId, jdbcTemplate);
+                query = "INSERT INTO" + Constants.TABLE_NOTIFICATIONS + "VALUES(?, ?, ?, ?, ?);";
+                jdbcTemplate.update(query, notification_id, skillEpisode.getSkillId(), userId, usr.getCostCenterId(), usr.getBusinessUnitId());
+            }
         }
     }
 
-    private void deleteExisitingEPisodes(long episodeId, JdbcTemplate jdbcTemplate) {
+    private void deleteExisitingEpisodes(long episodeId, JdbcTemplate jdbcTemplate) {
         String query = "DELETE FROM" + Constants.TABLE_SKILL_EPISODES + "where episode_id = ?;";
         jdbcTemplate.update(query, episodeId);
     }

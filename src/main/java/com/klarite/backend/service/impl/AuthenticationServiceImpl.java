@@ -4,6 +4,8 @@ import com.klarite.backend.Constants;
 import com.klarite.backend.dto.User;
 import com.klarite.backend.service.AuthenticationService;
 import com.klarite.backend.service.UserService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,9 @@ import java.util.UUID;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
+    @Autowired
+    private UserService userService;
+
     @Override
     public ResponseEntity<Object> login(String userName, String password, JdbcTemplate jdbcTemplate) {
         String query = "SELECT id AS userId " +
@@ -25,7 +30,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         ResponseEntity<Object> response;
         try {
             Map<String, Object> row = jdbcTemplate.queryForMap(query, userName, password);
-            UserService userService = new UserServiceImpl();
             user = userService.getUser((Long) row.get("userId"), jdbcTemplate);
             UUID token = generateToken(jdbcTemplate);
             user.setToken(token.toString());

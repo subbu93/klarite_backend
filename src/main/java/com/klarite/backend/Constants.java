@@ -19,6 +19,9 @@ public class Constants {
     public static final String TABLE_T_ASSIGNMENTS = " t_assignments ";
     public static final String TABLE_TRAINING_ASSIGNMENTS = " training_assignments ";
     public static final String TABLE_TOKENS = " tokens ";
+    public static final String TABLE_NOTIFICATIONS = " notifications ";
+    public static final String TABLE_OBSERVATION_REQUEST_NOTIFICATION = " observation_request_notification ";
+    public static final String TABLE_OBSERVATION_RESPONSE_NOTIFICATION = " observation_response_notification ";
 
     // return msgs
     public static final String MSG_MARK_ATTENDANCE_SUCCESS = "Attendance marked successfully";
@@ -26,6 +29,8 @@ public class Constants {
     public static final String MSG_MARK_ATTENDANCE_INVALID_TIME = "Failed to mark attendance. Reason: 'Inavlid time'.";
     public static final String MSG_UPDATED_SUCCESSFULLY = "Data updated successfully.";
     public static final String MSG_UPDATE_FAILED = "Failed to update data.";
+    public static final String MSG_DELETE_SUCCESS = "Item deleted successfully";
+    public static final String MSG_DELETE_FAILED = "Failed to delete item";
 
     // directories
     public static final String DIRECTORY_UPLOADS = "uploads";
