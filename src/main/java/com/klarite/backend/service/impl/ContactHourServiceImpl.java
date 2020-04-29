@@ -32,7 +32,7 @@ public class ContactHourServiceImpl implements ContactHourService {
         ContinuedEducationEvents ce = new ContinuedEducationEvents();
         ce.setCeHrsPerYear(100); // todo:ishan- fix this value
         ce.setTrainings(getTrainingsWithCE(userId, jdbcTemplate));
-        ce.setEducation(getEducationWithCE(userId, jdbcTemplate));
+        ce.setEducation(getEducation(userId, jdbcTemplate));
         return ce;
     }
 
@@ -122,9 +122,9 @@ public class ContactHourServiceImpl implements ContactHourService {
         return trainings;
     }
 
-    private List<ContinuedEducation> getEducationWithCE(Long userId, JdbcTemplate jdbcTemplate) {
+    private List<ContinuedEducation> getEducation(Long userId, JdbcTemplate jdbcTemplate) {
         List<ContinuedEducation> educations = new ArrayList<>();
-        String query = "SELECT * FROM " + Constants.TABLE_CONTACT_HOURS + " WHERE is_ce = 1 AND user_id = ?;";
+        String query = "SELECT * FROM " + Constants.TABLE_CONTACT_HOURS + " WHERE user_id = ?;";
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, userId);
         for (Map<String, Object> row : rows) {
             ContinuedEducation obj = new ContinuedEducation();
