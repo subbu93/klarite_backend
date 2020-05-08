@@ -1,6 +1,5 @@
 package com.klarite.backend.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.klarite.backend.dto.Notification.Notification;

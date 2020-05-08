@@ -4,6 +4,8 @@ import com.klarite.backend.Constants;
 import com.klarite.backend.dto.Episode;
 import com.klarite.backend.dto.SkillEpisode;
 import com.klarite.backend.dto.User;
+import com.klarite.backend.dto.Notification.NotificationType;
+import com.klarite.backend.dto.Notification.ObservationRequestNotification;
 import com.klarite.backend.service.UserService;
 
 import org.apache.commons.io.FileUtils;
@@ -16,6 +18,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -228,17 +231,18 @@ public class UserServiceImpl implements UserService {
             if (!skillEpisode.isObserved() || skillEpisode.getObserverId() == 0)
                 jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(), skillEpisode.isObserved(), null);
             else
-            {
-                jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(), skillEpisode.isObserved(),
-                        skillEpisode.getObserverId());
-                
-                query = "INSERT INTO" + Constants.TABLE_NOTIFICATIONS + "VALUES(?); SELECT SCOPE_IDENTITY() as id;";
-                Map<String, Object> row = jdbcTemplate.queryForMap(query, true);
-                BigDecimal notification_id = (BigDecimal) row.get("id");
+                jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(), skillEpisode.isObserved(), skillEpisode.getObserverId());
+
+            if (skillEpisode.isObserved()) {
                 User usr = getUser(userId, jdbcTemplate);
-                query = "INSERT INTO" + Constants.TABLE_NOTIFICATIONS + "VALUES(?, ?, ?, ?, ?);";
-                jdbcTemplate.update(query, notification_id, skillEpisode.getSkillId(), userId, usr.getCostCenterId(),
-                        usr.getBusinessUnitId());
+                String payload = ObservationRequestNotification.getPayload(skillEpisode.getSkillId());
+                query = "INSERT INTO" + Constants.TABLE_NOTIFICATIONS + "(cost_center_id, business_unit_id, "
+                        + "sender_id, payload, type, date, time, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+                java.util.Date date = new java.util.Date();
+                String dateStr = (new SimpleDateFormat("yyyy-MM-dd")).format(date);
+                String timeStr = (new SimpleDateFormat("hh:mm:ss")).format(date);
+                jdbcTemplate.update(query, usr.getCostCenterId(), usr.getBusinessUnitId(), userId, payload,
+                    NotificationType.ObservationRequest, dateStr, timeStr, true);
             }
         }
     }
