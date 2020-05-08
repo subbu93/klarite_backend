@@ -11,6 +11,8 @@ public class SkillAssignment {
     private String skillAssignmentName;
     private String costCenterName;
     private Integer costCenterId;
+    private String businessUnitName;
+    private Integer businessUnitId;
     private String AssignedSkill;
     private Long skillValidatorId;
     private Date CompletionDate;
@@ -86,6 +88,22 @@ public class SkillAssignment {
 
     public void setCostCenterId(Integer costCenterId) {
         this.costCenterId = costCenterId;
+    }
+
+    public String getBusinessUnitName() {
+        return businessUnitName;
+    }
+
+    public void setBusinessUnitName(String businessUnitName) {
+        this.businessUnitName = businessUnitName;
+    }
+
+    public Integer getBusinessUnitId() {
+        return businessUnitId;
+    }
+
+    public void setBusinessUnitId(Integer businessUnitId) {
+        this.businessUnitId = businessUnitId;
     }
 
     public Long getSkillValidatorId() {

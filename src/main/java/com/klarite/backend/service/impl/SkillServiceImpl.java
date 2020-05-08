@@ -3,6 +3,7 @@ package com.klarite.backend.service.impl;
 import com.klarite.backend.Constants;
 import com.klarite.backend.dto.*;
 import com.klarite.backend.service.SkillService;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,7 +27,13 @@ public class SkillServiceImpl implements SkillService {
         String costCenterIdQuery = "SELECT cost_center.* " +
                 "FROM   " + Constants.TABLE_USERS + " AS u " +
                 "       INNER JOIN " + Constants.TABLE_COST_CENTER +
-                "               ON users.cost_center_id = cost_center.id " +
+                "               ON u.cost_center_id = cost_center.id " +
+                "WHERE  u.id = ?" +
+                "       AND u.soft_delete = 0;";
+        String businessUnitIdQuery = "SELECT business_unit.* " +
+                "FROM   " + Constants.TABLE_USERS + " AS u " +
+                "       INNER JOIN " + Constants.TABLE_BUSINESS_UNIT +
+                "               ON u.cost_center_id = business_unit.id " +
                 "WHERE  u.id = ?" +
                 "       AND u.soft_delete = 0;";
 
@@ -49,9 +56,14 @@ public class SkillServiceImpl implements SkillService {
             obj.setSkillId((Long) row.get("skill_id"));
             obj.setSkillAssignmentName((String) row.get("name"));
 
-            Map<String, Object> costCenterIdRow = jdbcTemplate.queryForMap(costCenterIdQuery, obj.getAssignedUserIds().get(0));
+            Map<String, Object> costCenterIdRow = jdbcTemplate.queryForMap(costCenterIdQuery,
+                    obj.getAssignedUserIds().get(0));
             obj.setCostCenterName((String) costCenterIdRow.get("name"));
             obj.setCostCenterId((Integer) costCenterIdRow.get("id"));
+            Map<String, Object> businessUnitIdRow = jdbcTemplate.queryForMap(businessUnitIdQuery,
+                    obj.getAssignedUserIds().get(0));
+            obj.setBusinessUnitName((String) businessUnitIdRow.get("name"));
+            obj.setBusinessUnitId((Integer) businessUnitIdRow.get("id"));
             obj.setCompletionDate((java.util.Date) row.get("completion_date"));
             obj.setSkillValidatorId((Long) row.get("validator_id"));
 
@@ -187,6 +199,40 @@ public class SkillServiceImpl implements SkillService {
             return new HashMap<>();
         }
         return assignedSkillsForAllUsers;
+    }
+
+    @Override
+    public List<GraphData> getUsersPerSkillData(Long businessUnitId, Long costCenterId,
+                                                      Long skillId, JdbcTemplate jdbcTemplate) {
+        String getUserFromCostCenterQuery = "SELECT Distinct * " +
+                "                   FROM " + Constants.TABLE_SKILL_ASSIGNMENTS +
+                "                   WHERE  assignment_id IN (SELECT id " +
+                "                                            FROM " + Constants.TABLE_S_ASSIGNMENTS+
+                "                                            WHERE  skill_id = ?);";
+
+        List<GraphData> usersPerSkillData;
+        try {
+            usersPerSkillData = new ArrayList<>();
+            UserServiceImpl userService = new UserServiceImpl();
+            AdminServiceImpl adminService = new AdminServiceImpl();
+            Skill skill = adminService.getSkill(skillId, jdbcTemplate);
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(getUserFromCostCenterQuery,
+                    skillId);
+            for (Map<String, Object> row : rows) {
+                GraphData temp = new GraphData();
+                User user = userService.getUser((Long) row.get("user_id"), jdbcTemplate);
+                temp.setName(user.getFirstName() + " " + user.getLastName());
+                temp.setValue(getEpisodeCount(skillId, user.getId(), jdbcTemplate));
+                Map<String, Integer> map = new HashMap<>();
+                map.put("threshold", skill.getThreshold());
+                temp.setExtra(map);
+
+                usersPerSkillData.add(temp);
+            }
+            return usersPerSkillData;
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
 
     private ResponseEntity<Object> updateSkillAssignment(SkillAssignment skillAssignment, JdbcTemplate jdbcTemplate) {

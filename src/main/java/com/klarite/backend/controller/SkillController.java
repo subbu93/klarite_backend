@@ -64,4 +64,11 @@ public class SkillController {
                                                      @RequestParam(value = "costCenterId") Long costCenterId) {
         return skillService.getAnalysisData(businessUnitId, costCenterId, jdbcTemplate);
     }
+
+    @GetMapping("/skill/get-users-per-skill-data")
+    public List<GraphData> getUsersPerSkillData(@RequestParam(value = "businessUnitId") Long businessUnitId,
+                                                      @RequestParam(value = "costCenterId") Long costCenterId,
+                                                      @RequestParam(value = "skillId") Long skillId) {
+        return skillService.getUsersPerSkillData(businessUnitId, costCenterId, skillId, jdbcTemplate);
+    }
 }

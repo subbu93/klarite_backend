@@ -1,5 +1,7 @@
 package com.klarite.backend.dto;
 
+import org.apache.commons.text.WordUtils;
+
 public class User {
     private Long id;
     private String osuId;
@@ -39,7 +41,7 @@ public class User {
     }
 
     public void setFirstName(String firstName) {
-        this.firstName = firstName;
+        this.firstName = WordUtils.capitalizeFully(firstName);
     }
 
     public String getMiddleName() {
@@ -47,7 +49,7 @@ public class User {
     }
 
     public void setMiddleName(String middleName) {
-        this.middleName = middleName;
+        this.middleName = WordUtils.capitalizeFully(middleName);
     }
 
     public String getLastName() {
@@ -55,7 +57,7 @@ public class User {
     }
 
     public void setLastName(String lastName) {
-        this.lastName = lastName;
+        this.lastName = WordUtils.capitalizeFully(lastName);
     }
 
     public String getEmail() {

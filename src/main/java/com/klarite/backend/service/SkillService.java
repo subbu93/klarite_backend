@@ -25,4 +25,6 @@ public interface SkillService {
     List<Skill> getAssignedSkills(Long userId, JdbcTemplate jdbcTemplate);
 
     Map<Long, List<Skill>> getAnalysisData(Long businessUnitId, Long costCenterId, JdbcTemplate jdbcTemplate);
+
+    List<GraphData> getUsersPerSkillData(Long businessUnitId, Long costCenterId, Long skillId, JdbcTemplate jdbcTemplate);
 }
