@@ -29,6 +29,7 @@ public class Constants {
     public static final String MSG_UPDATE_FAILED = "Failed to update data.";
     public static final String MSG_DELETE_SUCCESS = "Item deleted successfully";
     public static final String MSG_DELETE_FAILED = "Failed to delete item";
+    public static final String MSG_UNAUTHORIZED = "User is not logged in";
 
     // directories
     public static final String DIRECTORY_UPLOADS = "uploads";

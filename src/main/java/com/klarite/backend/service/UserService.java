@@ -21,4 +21,6 @@ public interface UserService {
     User getUser(Long userId, Boolean getImageData, JdbcTemplate jdbcTemplate);
 
     ResponseEntity<Object> addUser(User user, JdbcTemplate jdbcTemplate);
+
+    ResponseEntity<Object> updateProfilePic(Long userId, String imageData, JdbcTemplate jdbcTemplate);
 }
