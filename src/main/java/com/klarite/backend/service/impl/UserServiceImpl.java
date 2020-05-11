@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
             updateFileOnDisk(imageData, fileName);
             String query = "UPDATE " + Constants.TABLE_USERS + " SET image_url = ? WHERE id = ?";
             jdbcTemplate.update(query, fileName, userId);
-            return new ResponseEntity<>(Constants.MSG_MARK_ATTENDANCE_SUCCESS, HttpStatus.OK);
+            return new ResponseEntity<>(Constants.MSG_UPDATED_SUCCESSFULLY, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
