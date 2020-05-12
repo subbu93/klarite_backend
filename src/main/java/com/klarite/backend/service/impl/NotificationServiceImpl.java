@@ -7,11 +7,8 @@ import java.util.Map;
 
 import com.klarite.backend.Constants;
 import com.klarite.backend.Privileges;
+import com.klarite.backend.dto.Notification.*;
 import com.klarite.backend.dto.User;
-import com.klarite.backend.dto.Notification.Notification;
-import com.klarite.backend.dto.Notification.NotificationType;
-import com.klarite.backend.dto.Notification.ObservationRequestNotification;
-import com.klarite.backend.dto.Notification.ObservationResponseNotification;
 import com.klarite.backend.service.AdminService;
 import com.klarite.backend.service.NotificationService;
 import com.klarite.backend.service.UserService;
@@ -46,7 +43,8 @@ public class NotificationServiceImpl implements NotificationService {
             ObservationRequestNotification notification = getRequestNotification(id, jdbcTemplate);
             User owner = userService.getUser(notification.getRequesterId(), false, jdbcTemplate);
 
-            String payload = ObservationResponseNotification.getPayload(notification.getSkillId(), comment, accepted);
+            ObservationResponseNotification orn = new ObservationResponseNotification();
+            String payload = orn.fetchPayload();
             java.util.Date date = new java.util.Date();
             String dateStr = (new SimpleDateFormat("yyyy-MM-dd")).format(date);
             String timeStr = (new SimpleDateFormat("hh:mm:ss")).format(date);
@@ -72,9 +70,40 @@ public class NotificationServiceImpl implements NotificationService {
                 notifications.addAll(getRequestedObservations(usr, getActive, jdbcTemplate));
             }
             notifications.addAll(getObservationResponses(usr, getActive, jdbcTemplate));
+            notifications.addAll(getValidationNotification(usr, getActive, jdbcTemplate));
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return notifications;
+    }
+
+    private List<Notification> getValidationNotification(User usr, Boolean getActive, JdbcTemplate jdbcTemplate) {
+        List<Notification> notifications = new ArrayList<>();
+        int onlyGetActive = getActive ? 1 : 0;
+        String query = "SELECT * FROM " + Constants.TABLE_NOTIFICATIONS +
+                " WHERE business_unit_id = ? and cost_center_id = ? and type = ?";
+
+        List<Map<String, Object>> rows;
+        if (getActive) {
+            query = query + " and " + Constants.TABLE_NOTIFICATIONS.trim() + ".is_active = ?";
+            rows = jdbcTemplate.queryForList(query, usr.getBusinessUnitId(), usr.getCostCenterId(), NotificationType.SkillValidation, onlyGetActive);
+        }else {
+            rows = jdbcTemplate.queryForList(query, usr.getBusinessUnitId(), usr.getCostCenterId(), NotificationType.SkillValidation);
+        }
+        for (Map<String, Object> row : rows) {
+            SkillValidationNotification obj = new SkillValidationNotification();
+
+            User requester = userService.getUser((Long) row.get("sender_id"), jdbcTemplate);
+            obj.setId((Long) row.get("id"));
+            obj.setActive((Boolean) row.get("is_active"));
+            obj.setRequesterName(requester.getFirstName() + " " + requester.getLastName());
+            obj.setRequesterId(requester.getId());
+            obj.parseJSONString((String) row.get("payload"));
+            obj.setSkillName(adminService.getSkill(obj.getSkillId(), jdbcTemplate).getSkillName());
+
+            notifications.add(obj);
+        }
+
         return notifications;
     }
 

@@ -5,7 +5,8 @@ public class ContactHours {
     private String state;
     private String userTitle;
     private String position;
-    private Integer ceHrsPerYear;
+    private Integer ceHrs;
+    private Integer timePeriod;
 
     public Long getId() {
         return id;
@@ -39,11 +40,19 @@ public class ContactHours {
         this.position = position;
     }
 
-    public Integer getCeHrsPerYear() {
-        return ceHrsPerYear;
+    public Integer getCeHrs() {
+        return ceHrs;
     }
 
-    public void setCeHrsPerYear(Integer ceHrsPerYear) {
-        this.ceHrsPerYear = ceHrsPerYear;
+    public void setCeHrs(Integer ceHrs) {
+        this.ceHrs = ceHrs;
+    }
+
+    public Integer getTimePeriod() {
+        return timePeriod;
+    }
+
+    public void setTimePeriod(Integer timePeriod) {
+        this.timePeriod = timePeriod;
     }
 }

@@ -5,7 +5,7 @@ import java.util.Map;
 public class GraphData {
     private String name;
     private Integer value;
-    private Map<String, Integer> extra;
+    private Map<String, Long> extra;
 
     public String getName() {
         return name;
@@ -23,11 +23,11 @@ public class GraphData {
         this.value = value;
     }
 
-    public Map<String, Integer> getExtra() {
+    public Map<String, Long> getExtra() {
         return extra;
     }
 
-    public void setExtra(Map<String, Integer> extra) {
+    public void setExtra(Map<String, Long> extra) {
         this.extra = extra;
     }
 }

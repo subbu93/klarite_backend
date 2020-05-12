@@ -235,7 +235,8 @@ public class UserServiceImpl implements UserService {
 
             if (skillEpisode.isObserved()) {
                 User usr = getUser(userId, jdbcTemplate);
-                String payload = ObservationRequestNotification.getPayload(skillEpisode.getSkillId());
+                ObservationRequestNotification orn = new ObservationRequestNotification();
+                String payload = orn.fetchPayload();
                 query = "INSERT INTO" + Constants.TABLE_NOTIFICATIONS + "(cost_center_id, business_unit_id, "
                         + "sender_id, payload, type, date, time, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
                 java.util.Date date = new java.util.Date();

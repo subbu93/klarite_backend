@@ -27,4 +27,8 @@ public interface SkillService {
     Map<Long, List<Skill>> getAnalysisData(Long businessUnitId, Long costCenterId, JdbcTemplate jdbcTemplate);
 
     List<GraphData> getUsersPerSkillData(Long businessUnitId, Long costCenterId, Long skillId, JdbcTemplate jdbcTemplate);
+
+    List<ValidationData> getSkillValidation(Long userId, JdbcTemplate jdbcTemplate);
+
+    ResponseEntity<Object> saveSkillValidation(List<ValidationData> validationDataList, JdbcTemplate jdbcTemplate);
 }

@@ -2,15 +2,18 @@ package com.klarite.backend.service.impl;
 
 import com.klarite.backend.Constants;
 import com.klarite.backend.dto.*;
+import com.klarite.backend.dto.Notification.NotificationType;
+import com.klarite.backend.dto.Notification.SkillValidationNotification;
 import com.klarite.backend.service.SkillService;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.SQLWarningException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -182,7 +185,7 @@ public class SkillServiceImpl implements SkillService {
                                                   Long costCenterId,
                                                   JdbcTemplate jdbcTemplate) {
         String getUserFromCostCenterQuery = "SELECT id " +
-                " FROM "+ Constants.TABLE_USERS +
+                " FROM " + Constants.TABLE_USERS +
                 " WHERE  cost_center_id = ? " +
                 "       AND business_unit_id = ?" +
                 "       AND soft_delete = 0;";
@@ -203,11 +206,11 @@ public class SkillServiceImpl implements SkillService {
 
     @Override
     public List<GraphData> getUsersPerSkillData(Long businessUnitId, Long costCenterId,
-                                                      Long skillId, JdbcTemplate jdbcTemplate) {
+                                                Long skillId, JdbcTemplate jdbcTemplate) {
         String getUserFromCostCenterQuery = "SELECT Distinct * " +
                 "                   FROM " + Constants.TABLE_SKILL_ASSIGNMENTS +
                 "                   WHERE  assignment_id IN (SELECT id " +
-                "                                            FROM " + Constants.TABLE_S_ASSIGNMENTS+
+                "                                            FROM " + Constants.TABLE_S_ASSIGNMENTS +
                 "                                            WHERE  skill_id = ?);";
 
         List<GraphData> usersPerSkillData;
@@ -223,8 +226,9 @@ public class SkillServiceImpl implements SkillService {
                 User user = userService.getUser((Long) row.get("user_id"), jdbcTemplate);
                 temp.setName(user.getFirstName() + " " + user.getLastName());
                 temp.setValue(getEpisodeCount(skillId, user.getId(), jdbcTemplate));
-                Map<String, Integer> map = new HashMap<>();
-                map.put("threshold", skill.getThreshold());
+                Map<String, Long> map = new HashMap<>();
+                map.put("threshold", (long) skill.getThreshold());
+                map.put("userId", user.getId());
                 temp.setExtra(map);
 
                 usersPerSkillData.add(temp);
@@ -232,6 +236,95 @@ public class SkillServiceImpl implements SkillService {
             return usersPerSkillData;
         } catch (Exception e) {
             return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public List<ValidationData> getSkillValidation(Long userId, JdbcTemplate jdbcTemplate) {
+        String getValidationListQuery = "SELECT t2.*, " +
+                "       users.first_name, " +
+                "       users.last_name " +
+                "FROM   (SELECT t1.*, " +
+                "               skills.name, " +
+                "               skills.threshold " +
+                "        FROM   (SELECT * " +
+                "                FROM " + Constants.TABLE_SKILL_EPISODES + " se " +
+                "                       INNER JOIN " + Constants.TABLE_EPISODES +
+                "                               ON se.episode_id = episodes.id " +
+                "                WHERE  se.observer_id = ? AND se.is_validated = 0 AND se.is_remediated = 0) AS t1 " +
+                "               INNER JOIN " + Constants.TABLE_SKILLS +
+                "                       ON t1.skill_id = skills.id " +
+                "        WHERE  skills.soft_delete = 0) AS t2 " +
+                "       INNER JOIN " + Constants.TABLE_USERS +
+                "               ON t2.user_id = users.id " +
+                "WHERE  users.soft_delete = 0;";
+
+        try {
+            List<ValidationData> validationData = new ArrayList<>();
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(getValidationListQuery, userId);
+
+            for (Map<String, Object> row : rows) {
+                ValidationData temp = new ValidationData();
+                temp.setEpisodeId((long) row.get("episode_id"));
+                temp.setSkillId((long) row.get("skill_id"));
+                temp.setSkillName((String) row.get("name"));
+                temp.setUserId((long) row.get("user_id"));
+                temp.setObserverId((long) row.get("observer_id"));
+                temp.setMrn((String) row.get("mrn"));
+                temp.setFirstName((String) row.get("first_name"));
+                temp.setLastName((String) row.get("last_name"));
+                temp.setDate((Date) row.get("date"));
+                temp.setValidated((boolean) row.get("is_validated"));
+                temp.setObserved((boolean) row.get("is_observed"));
+                temp.setRemediated((boolean) row.get("is_remediated"));
+
+                validationData.add(temp);
+            }
+            return validationData;
+        } catch (SQLWarningException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public ResponseEntity<Object> saveSkillValidation(List<ValidationData> validationDataList, JdbcTemplate jdbcTemplate) {
+        String updateSkillEpisodesQuery = "UPDATE " + Constants.TABLE_SKILL_EPISODES +
+                " SET is_validated = ?, is_remediated = ?, comment = ? " +
+                " WHERE episode_id = ? AND skill_id = ?";
+        try {
+            for (ValidationData validationData : validationDataList) {
+                if (validationData.isValidated() || validationData.isRemediated()) {
+                    jdbcTemplate.update(updateSkillEpisodesQuery, validationData.isValidated(),
+                            validationData.isRemediated(), validationData.getComment(),
+                            validationData.getEpisodeId(), validationData.getSkillId());
+
+                    // Store Notification
+                    UserServiceImpl userService = new UserServiceImpl();
+                    User usr = userService.getUser(validationData.getObserverId(), jdbcTemplate);
+                    SkillValidationNotification orn = new SkillValidationNotification();
+                    if (validationData.isValidated()) {
+                        orn.setValidated(true);
+                    } else {
+                        orn.setValidated(false);
+                    }
+                    orn.setComment(validationData.getComment());
+                    orn.setEpisodeId(validationData.getEpisodeId());
+                    orn.setSkillId(validationData.getSkillId());
+                    orn.setSkillName(validationData.getSkillName());
+                    String payload = orn.fetchPayload();
+                    String query = "INSERT INTO" + Constants.TABLE_NOTIFICATIONS + "(cost_center_id, business_unit_id, "
+                            + "sender_id, receiver_id, payload, type, date, time, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                    java.util.Date date = new java.util.Date();
+                    String dateStr = (new SimpleDateFormat("yyyy-MM-dd")).format(date);
+                    String timeStr = (new SimpleDateFormat("hh:mm:ss")).format(date);
+                    jdbcTemplate.update(query, usr.getCostCenterId(), usr.getBusinessUnitId(),
+                            validationData.getObserverId(), validationData.getUserId(), payload,
+                            NotificationType.SkillValidation, dateStr, timeStr, true);
+                }
+            }
+            return new ResponseEntity<>("Stored", HttpStatus.CREATED);
+        } catch (SQLWarningException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -330,7 +423,6 @@ public class SkillServiceImpl implements SkillService {
                 obj.setUserId((Long) row.get("user_id"));
                 obj.setDate((Date) row.get("date"));
                 obj.setMrn((String) row.get("mrn"));
-                obj.setAudited((boolean) row.get("is_audited"));
                 for (Map<String, Object> new_row : new_rows) {
                     SkillEpisode skillEpisode = new SkillEpisode();
                     skillEpisode.setSkillId((Long) new_row.get("skill_id"));

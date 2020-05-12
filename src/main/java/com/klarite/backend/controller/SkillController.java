@@ -71,4 +71,14 @@ public class SkillController {
                                                       @RequestParam(value = "skillId") Long skillId) {
         return skillService.getUsersPerSkillData(businessUnitId, costCenterId, skillId, jdbcTemplate);
     }
+
+    @GetMapping("/skill/get-skill-validation")
+    public List<ValidationData> getSkillValidation(@RequestParam(value = "userId") Long userId) {
+        return skillService.getSkillValidation(userId, jdbcTemplate);
+    }
+
+    @PostMapping("/skill/store-skill-validation")
+    public ResponseEntity<Object> saveSkillValidation(@RequestBody List<ValidationData> validationDataList) {
+        return skillService.saveSkillValidation(validationDataList, jdbcTemplate);
+    }
 }

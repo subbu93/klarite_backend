@@ -5,4 +5,5 @@ public class NotificationType {
     public static final int ObservationResponse = 1;
     public static final int UpcomingTraining = 2;
     public static final int SkillAssigned = 3;
+    public static final int SkillValidation = 4;
 }

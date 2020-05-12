@@ -19,6 +19,32 @@ public class ObservationRequestNotification extends Notification {
         return NotificationType.ObservationResponse;
     }
 
+    @Override
+    public String fetchPayload() {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, String> map = new HashMap<>();
+        try {
+            map.put("skillId", skillId.toString());
+            // convert map to JSON string
+            return mapper.writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    @Override
+    public void parseJSONString(String payload) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            // convert JSON string to Map
+            Map<String, String> map = mapper.readValue(payload, new TypeReference<Map<String, String>>(){});
+            setSkillId(Long.parseLong(map.get("skillId")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public Long getSkillId() {
         return skillId;
     }
@@ -49,29 +75,5 @@ public class ObservationRequestNotification extends Notification {
 
     public void setRequesterId(Long requesterId) {
         this.requesterId = requesterId;
-    }
-
-    public static String getPayload(Long skillId) {
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, String> map = new HashMap<>();
-        try {
-            map.put("skillId", skillId.toString());
-            // convert map to JSON string
-            return mapper.writeValueAsString(map);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
-
-    public void parseJSONString(String payload) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            // convert JSON string to Map
-            Map<String, String> map = mapper.readValue(payload, new TypeReference<Map<String, String>>(){});
-            setSkillId(Long.parseLong(map.get("skillId")));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

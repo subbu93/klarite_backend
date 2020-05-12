@@ -1,22 +1,23 @@
 package com.klarite.backend.dto.Notification;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class ObservationResponseNotification extends Notification {
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class SkillValidationNotification extends Notification {
     private Long skillId;
-    private String skillName;
+    private Long episodeId;
     private String comment;
-    private Boolean isAccepted;
+    private Boolean isValidated;
+    private String skillName;
 
     @Override
     public int getType() {
-        return NotificationType.ObservationResponse;    
+        return NotificationType.SkillValidation;
     }
 
     @Override
@@ -25,8 +26,10 @@ public class ObservationResponseNotification extends Notification {
         Map<String, String> map = new HashMap<>();
         try {
             map.put("skillId", skillId.toString());
+            map.put("episodeId", episodeId.toString());
             map.put("comment", comment);
-            map.put("isAccepted", isAccepted.toString());
+            map.put("isValidated", isValidated.toString());
+
             // convert map to JSON string
             return mapper.writeValueAsString(map);
         } catch (JsonProcessingException e) {
@@ -40,10 +43,12 @@ public class ObservationResponseNotification extends Notification {
         ObjectMapper mapper = new ObjectMapper();
         try {
             // convert JSON string to Map
-            Map<String, String> map = mapper.readValue(payload, new TypeReference<Map<String, String>>(){});
+            Map<String, String> map = mapper.readValue(payload, new TypeReference<Map<String, String>>() {
+            });
             setSkillId(Long.parseLong(map.get("skillId")));
+            setEpisodeId(Long.parseLong(map.get("episodeId")));
             setComment(map.get("comment"));
-            setIsAccepted(Boolean.parseBoolean(map.get("isAccepted")));
+            setValidated(Boolean.parseBoolean(map.get("isValidated")));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -57,27 +62,35 @@ public class ObservationResponseNotification extends Notification {
         this.skillId = skillId;
     }
 
-    public String getSkillName() {
-        return skillName;
+    public Long getEpisodeId() {
+        return episodeId;
     }
 
-    public void setSkillName(String skillName) {
-        this.skillName = skillName;
+    public void setEpisodeId(Long episodeId) {
+        this.episodeId = episodeId;
     }
 
     public String getComment() {
         return comment;
     }
 
-    public void setComment(String description) {
-        this.comment = description;
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
-    public Boolean getIsAccepted() {
-        return isAccepted;
+    public Boolean getValidated() {
+        return isValidated;
     }
 
-    public void setIsAccepted(Boolean isAccepted) {
-        this.isAccepted = isAccepted;
+    public void setValidated(Boolean validated) {
+        isValidated = validated;
+    }
+
+    public String getSkillName() {
+        return skillName;
+    }
+
+    public void setSkillName(String skillName) {
+        this.skillName = skillName;
     }
 }

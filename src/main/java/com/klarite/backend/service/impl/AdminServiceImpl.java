@@ -56,11 +56,11 @@ public class AdminServiceImpl implements AdminService {
                 "      ,t.name as Training_prerequisite" +
                 "      ,t.id as training_id" +
                 "     FROM skills as sk, trainings as t" +
-                "     WHERE sk.id = " + id + " AND " +
+                "     WHERE sk.id = ? AND " +
                 "      t.id = sk.training_prerequisite_id" +
                 "      AND sk.soft_delete = 0";
 
-        Map<String, Object> row = jdbcTemplate.queryForMap(query);
+        Map<String, Object> row = jdbcTemplate.queryForMap(query, id);
 
         Skill skill = new Skill();
 
@@ -270,13 +270,15 @@ public class AdminServiceImpl implements AdminService {
         String query = "";
         if (ce.getId() == null) {
             query = "INSERT INTO " + Constants.TABLE_CONTINUED_EDUCATION +
-                    " (state, title, position , ce_hours_per_year) " +
+                    " (state, title, position, ce_hours, time_period) " +
                     " VALUES      (?," +
                     "             ?, " +
                     "             ?," +
+                    "             ?," +
                     "             ?); ";
             try {
-                jdbcTemplate.update(query, ce.getState(), ce.getUserTitle(), ce.getPosition(), ce.getCeHrsPerYear());
+                jdbcTemplate.update(query, ce.getState(), ce.getUserTitle(), ce.getPosition(),
+                        ce.getCeHrs(), ce.getTimePeriod());
                 ResponseEntity<Object> response = new ResponseEntity<>("Stored", HttpStatus.CREATED);
                 return response;
             } catch (Exception e) {
@@ -284,11 +286,11 @@ public class AdminServiceImpl implements AdminService {
             }
         } else {
             query = "UPDATE " + Constants.TABLE_CONTINUED_EDUCATION +
-                    " SET state = ?, title = ?, position = ?, ce_hours_per_year = ? " +
+                    " SET state = ?, title = ?, position = ?, ce_hours = ?, time_period = ? " +
                     " WHERE id = ?;";
             try {
                 jdbcTemplate.update(query, ce.getState(), ce.getUserTitle(), ce.getPosition(),
-                        ce.getCeHrsPerYear(), ce.getId());
+                        ce.getCeHrs(), ce.getTimePeriod(), ce.getId());
                 ResponseEntity<Object> response = new ResponseEntity<>("Stored", HttpStatus.CREATED);
                 return response;
             } catch (Exception e) {
@@ -314,7 +316,8 @@ public class AdminServiceImpl implements AdminService {
             ce.setPosition((String) row.get("position"));
             ce.setState((String) row.get("state"));
             ce.setUserTitle((String) row.get("title"));
-            ce.setCeHrsPerYear((Integer) row.get("ce_hours_per_year"));
+            ce.setCeHrs((Integer) row.get("ce_hours"));
+            ce.setTimePeriod((Integer) row.get("time_period"));
         } catch (Exception e) {
             System.out.println(e);
             return null;
