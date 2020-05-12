@@ -23,12 +23,13 @@ public class Constants {
 
     // return msgs
     public static final String MSG_MARK_ATTENDANCE_SUCCESS = "Attendance marked successfully";
-    public static final String MSG_MARK_ATTENDANCE_INVALID_UUID = "Failed to mark attendance. Reason: 'Invalid indetifier specified'.";
-    public static final String MSG_MARK_ATTENDANCE_INVALID_TIME = "Failed to mark attendance. Reason: 'Inavlid time'.";
+    public static final String MSG_MARK_ATTENDANCE_INVALID_UUID = "Failed to mark attendance.\\nReason: 'Invalid event code specified'.";
+    public static final String MSG_MARK_ATTENDANCE_INVALID_TIME = "Failed to mark attendance.\\nReason: 'Meeting not started yet'.";
     public static final String MSG_UPDATED_SUCCESSFULLY = "Data updated successfully.";
     public static final String MSG_UPDATE_FAILED = "Failed to update data.";
     public static final String MSG_DELETE_SUCCESS = "Item deleted successfully";
     public static final String MSG_DELETE_FAILED = "Failed to delete item";
+    public static final String MSG_UNAUTHORIZED = "User is not logged in";
 
     // directories
     public static final String DIRECTORY_UPLOADS = "uploads";

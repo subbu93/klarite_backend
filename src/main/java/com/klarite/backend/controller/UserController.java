@@ -1,6 +1,7 @@
 package com.klarite.backend.controller;
 
 import com.klarite.backend.dto.Episode;
+import com.klarite.backend.dto.ProfileImage;
 import com.klarite.backend.dto.User;
 import com.klarite.backend.service.AuthenticationService;
 import com.klarite.backend.service.UserService;
@@ -61,5 +62,15 @@ public class UserController {
     @GetMapping("/user_services/get_user_data")
     public User getUserData(@RequestParam(value = "userId") Long userId) {
         return userService.getUser(userId, true, jdbcTemplate);
+    }
+
+    @PostMapping("/user_services/update_picture")
+    public ResponseEntity<Object> updateProfilePic(@RequestHeader(value = "token") String token,
+                                                   @RequestBody ProfileImage data) {
+        if (authenticationService.isTokenValid(token, jdbcTemplate)) {
+            return userService.updateProfilePic(data.getUserId(), data.getImageData(), jdbcTemplate);
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
     }
 }

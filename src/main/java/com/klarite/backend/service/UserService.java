@@ -23,4 +23,6 @@ public interface UserService {
     ResponseEntity<Object> addUser(User user, JdbcTemplate jdbcTemplate);
 
     ResponseEntity<Object> deleteUser(Long userId, JdbcTemplate jdbcTemplate);
+
+    ResponseEntity<Object> updateProfilePic(Long userId, String imageData, JdbcTemplate jdbcTemplate);
 }

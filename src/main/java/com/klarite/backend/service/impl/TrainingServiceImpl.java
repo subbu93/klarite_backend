@@ -48,8 +48,15 @@ public class TrainingServiceImpl implements TrainingService {
             obj.setAssignmentId((Long) row.get("id"));
             List<Long> temp = new ArrayList<>();
             for (Map<String, Object> userRow : userRows) {
-                temp.add((Long) userRow.get("user_id"));
+                Long tempUserId = (Long) userRow.get("user_id");
+                temp.add(tempUserId);
+                if (userId != null && tempUserId == userId) {
+                    obj.setAttended((Boolean) userRow.get("attended"));
+                }
             }
+            if (userId != null && !temp.contains(userId))
+                continue;
+
             obj.setAssignedUserIds(temp);
             obj.setTrainingId((Long) row.get("training_id"));
             obj.setTrainingAssignmentName((String) row.get("name"));

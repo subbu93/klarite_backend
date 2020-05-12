@@ -68,7 +68,7 @@ public class ContactHourServiceImpl implements ContactHourService {
     public ResponseEntity<Object> add(ContinuedEducation ce, JdbcTemplate jdbcTemplate) {
         try {
             String query = "INSERT INTO" + Constants.TABLE_CONTACT_HOURS + "VALUES(?, ?, ?, ?, ?, ?, ?, ?);";
-            ce.setUrl(getTempFileName(ce));
+            ce.setUrl(getTempFileName());
             updateFileOnDisk(ce);
             jdbcTemplate.update(query, ce.getUserId(), ce.getName(), ce.getDate(), ce.isCE(), ce.getPresenterName(),
                     ce.getTotalHours(), ce.getDescription(), ce.getUrl());
@@ -156,7 +156,7 @@ public class ContactHourServiceImpl implements ContactHourService {
         }
     }
 
-    private String getTempFileName(ContinuedEducation ce) {
+    private String getTempFileName() {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         return timestamp.getTime() + ".jpg";
     }

@@ -15,9 +15,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -70,6 +74,22 @@ public class UserServiceImpl implements UserService {
             } else
                 return new ResponseEntity<>(Constants.MSG_MARK_ATTENDANCE_INVALID_UUID, HttpStatus.BAD_REQUEST);
 
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Override
+    public ResponseEntity<Object> updateProfilePic(Long userId, String imageData, JdbcTemplate jdbcTemplate) {
+        try {
+            String fileName = getUser(userId, false, jdbcTemplate).getUrl();
+            if (fileName == null || fileName.length() == 0)
+                fileName = getTempFileName();
+            
+            updateFileOnDisk(imageData, fileName);
+            String query = "UPDATE " + Constants.TABLE_USERS + " SET image_url = ? WHERE id = ?";
+            jdbcTemplate.update(query, fileName, userId);
+            return new ResponseEntity<>(Constants.MSG_UPDATED_SUCCESSFULLY, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -265,5 +285,25 @@ public class UserServiceImpl implements UserService {
         boolean isDateValid = ((Date) row.get("date")).equals(new Date(System.currentTimeMillis()));
         boolean isTimeValid = true;    //todo ishan: fix this
         return isDateValid && isTimeValid;
+    }
+
+    private String updateFileOnDisk(String imageData, String fileName) throws FileNotFoundException, IOException {
+        String imagePath = Paths.get(Constants.DIRECTORY_PROFILE, fileName).toAbsolutePath().toString();
+        if (imageData != null && imageData.length() != 0) {
+            byte[] imageByte=Base64.getDecoder().decode(imageData);
+            FileOutputStream fs = new FileOutputStream(imagePath, false);
+            fs.write(imageByte);
+            fs.close();
+        } else {
+            new File(imagePath).delete();
+            fileName = "";
+        }
+
+        return fileName;
+    }
+
+    private String getTempFileName() {
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        return timestamp.getTime() + ".jpg";
     }
 }

@@ -19,6 +19,7 @@ public class TrainingAssignment {
     private List<Long> assignedUserIds;
     private List<String> assignedUserName;
     private String uuid;
+    private Boolean attended;
 
     public String getTrainingAssignmentName() {
         return trainingAssignmentName;
@@ -130,5 +131,13 @@ public class TrainingAssignment {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    public Boolean getAttended() {
+        return attended;
+    }
+
+    public void setAttended(Boolean attended) {
+        this.attended = attended;
     }
 }
