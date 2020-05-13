@@ -2,21 +2,26 @@ package com.klarite.backend.dto.Notification;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+
 public class ObservationRequestNotification extends Notification {
-    private Long skillId;
-    private String skillName;
-    private String requesterName;
-    private Long requesterId;
+    
+    private static final String EPISODE_ID_KEY = "episodeId";
+    private static final String SKILLS_KEY = "skills";
+    
+    private Long episodeId;
+    private Set<Long> skills;
 
     @Override
     public int getType() {
-        return NotificationType.ObservationResponse;
+        return NotificationType.ObservationRequest;
     }
 
     @Override
@@ -24,8 +29,8 @@ public class ObservationRequestNotification extends Notification {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, String> map = new HashMap<>();
         try {
-            map.put("skillId", skillId.toString());
-            // convert map to JSON string
+            map.put(EPISODE_ID_KEY, episodeId.toString());
+            map.put(SKILLS_KEY, mapper.writeValueAsString(skills));
             return mapper.writeValueAsString(map);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -37,43 +42,34 @@ public class ObservationRequestNotification extends Notification {
     public void parseJSONString(String payload) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            // convert JSON string to Map
             Map<String, String> map = mapper.readValue(payload, new TypeReference<Map<String, String>>(){});
-            setSkillId(Long.parseLong(map.get("skillId")));
+            setEpisodeId(Long.parseLong(map.get(EPISODE_ID_KEY)));
+            setSkills(mapper.readValue((String) map.get(SKILLS_KEY), new TypeReference<Set<Long>>(){}));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public Long getSkillId() {
-        return skillId;
+    public Long getEpisodeId() {
+        return episodeId;
     }
 
-    public void setSkillId(Long skillId) {
-        this.skillId = skillId;
+    public void setEpisodeId(Long episodeId) {
+        this.episodeId = episodeId;
     }
 
-    public String getSkillName() {
-        return skillName;
+    public void addSkillId(long skillId) {
+        if (skills == null)
+            skills = new HashSet<>();
+
+        skills.add(skillId);
     }
 
-    public void setSkillName(String skillName) {
-        this.skillName = skillName;
+    public Set<Long> getSkills() {
+        return skills;
     }
 
-    public String getRequesterName() {
-        return requesterName;
-    }
-
-    public void setRequesterName(String requesterName) {
-        this.requesterName = requesterName;
-    }
-
-    public Long getRequesterId() {
-        return requesterId;
-    }
-
-    public void setRequesterId(Long requesterId) {
-        this.requesterId = requesterId;
+    public void setSkills(Set<Long> skills) {
+        this.skills = skills;
     }
 }

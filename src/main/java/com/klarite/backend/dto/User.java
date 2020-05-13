@@ -147,4 +147,8 @@ public class User {
     public void setImageData(String imageData) {
         this.imageData = imageData;
     }
+
+    public String fetchFullName() {
+        return getFirstName() + " " + getLastName();
+    }
 }

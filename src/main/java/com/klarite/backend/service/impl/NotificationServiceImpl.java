@@ -41,9 +41,12 @@ public class NotificationServiceImpl implements NotificationService {
     public ResponseEntity<Object> respond(Long id, Long userId, Boolean accepted, String comment, JdbcTemplate jdbcTemplate) {
         try {
             ObservationRequestNotification notification = getRequestNotification(id, jdbcTemplate);
-            User owner = userService.getUser(notification.getRequesterId(), false, jdbcTemplate);
+            User owner = userService.getUser(notification.getSenderId(), false, jdbcTemplate);
 
             ObservationResponseNotification orn = new ObservationResponseNotification();
+            orn.setEpisodeId(notification.getEpisodeId());
+            orn.setComment(comment);
+            orn.setIsAccepted(accepted);
             String payload = orn.fetchPayload();
             java.util.Date date = new java.util.Date();
             String dateStr = (new SimpleDateFormat("yyyy-MM-dd")).format(date);
@@ -80,25 +83,22 @@ public class NotificationServiceImpl implements NotificationService {
     private List<Notification> getValidationNotification(User usr, Boolean getActive, JdbcTemplate jdbcTemplate) {
         List<Notification> notifications = new ArrayList<>();
         int onlyGetActive = getActive ? 1 : 0;
-        String query = "SELECT * FROM " + Constants.TABLE_NOTIFICATIONS +
-                " WHERE business_unit_id = ? and cost_center_id = ? and type = ?";
+        String query = "SELECT * FROM " + Constants.TABLE_NOTIFICATIONS +  " WHERE receiver_id = ? and type = ?";
 
         List<Map<String, Object>> rows;
         if (getActive) {
             query = query + " and " + Constants.TABLE_NOTIFICATIONS.trim() + ".is_active = ?";
-            rows = jdbcTemplate.queryForList(query, usr.getBusinessUnitId(), usr.getCostCenterId(), NotificationType.SkillValidation, onlyGetActive);
+            rows = jdbcTemplate.queryForList(query, usr.getId(), NotificationType.SkillValidation, onlyGetActive);
         }else {
-            rows = jdbcTemplate.queryForList(query, usr.getBusinessUnitId(), usr.getCostCenterId(), NotificationType.SkillValidation);
+            rows = jdbcTemplate.queryForList(query, usr.getId(), NotificationType.SkillValidation);
         }
         for (Map<String, Object> row : rows) {
-            SkillValidationNotification obj = new SkillValidationNotification();
+            Long senderId = (Long) row.get("sender_id");
+            User sender = userService.getUser(senderId, jdbcTemplate);
 
-            User requester = userService.getUser((Long) row.get("sender_id"), jdbcTemplate);
-            obj.setId((Long) row.get("id"));
-            obj.setActive((Boolean) row.get("is_active"));
-            obj.setRequesterName(requester.getFirstName() + " " + requester.getLastName());
-            obj.setRequesterId(requester.getId());
-            obj.parseJSONString((String) row.get("payload"));
+            SkillValidationNotification obj = new SkillValidationNotification();
+            obj.init((Long) row.get("id"), (Boolean) row.get("is_active"), usr.getId(), usr.fetchFullName(), senderId,
+                sender.fetchFullName(), (String) row.get("payload"));
             obj.setSkillName(adminService.getSkill(obj.getSkillId(), jdbcTemplate).getSkillName());
 
             notifications.add(obj);
@@ -121,16 +121,12 @@ public class NotificationServiceImpl implements NotificationService {
             rows = jdbcTemplate.queryForList(query, usr.getBusinessUnitId(), usr.getCostCenterId(), NotificationType.ObservationRequest);
         }
         for (Map<String, Object> row : rows) {
+            Long senderId = (Long) row.get("sender_id");
+            User sender = userService.getUser(senderId, jdbcTemplate);
+
             ObservationRequestNotification obj = new ObservationRequestNotification();
-
-            User requester = userService.getUser((Long) row.get("sender_id"), jdbcTemplate);
-            obj.setId((Long) row.get("id"));
-            obj.setActive((Boolean) row.get("is_active"));
-            obj.setRequesterName(requester.getFirstName() + " " + requester.getLastName());
-            obj.setRequesterId(requester.getId());
-            obj.parseJSONString((String) row.get("payload"));
-            obj.setSkillName(adminService.getSkill(obj.getSkillId(), jdbcTemplate).getSkillName());
-
+            obj.init((Long) row.get("id"), (Boolean) row.get("is_active"), usr.getId(), usr.fetchFullName(), senderId, 
+                sender.fetchFullName(), (String) row.get("payload"));
             notifications.add(obj);
         }
 
@@ -140,8 +136,7 @@ public class NotificationServiceImpl implements NotificationService {
     private List<Notification> getObservationResponses(User usr, Boolean getActive, JdbcTemplate jdbcTemplate) {
         List<Notification> notifications = new ArrayList<>();
         int onlyGetActive = getActive ? 1 : 0;
-        String query = "SELECT * FROM " + Constants.TABLE_NOTIFICATIONS + 
-                       " WHERE receiver_id = ? and type = ?";
+        String query = "SELECT * FROM " + Constants.TABLE_NOTIFICATIONS + " WHERE receiver_id = ? and type = ?";
         
         List<Map<String, Object>> rows;
         if (getActive) {
@@ -151,18 +146,12 @@ public class NotificationServiceImpl implements NotificationService {
             rows = jdbcTemplate.queryForList(query, usr.getId(), NotificationType.ObservationResponse);
         }
         for (Map<String, Object> row : rows) {
+            Long senderId = (Long) row.get("sender_id");
+            User sender = userService.getUser(senderId, jdbcTemplate);
+
             ObservationResponseNotification obj = new ObservationResponseNotification();
-
-            obj.setId((Long) row.get("id"));
-            obj.setActive((Boolean) row.get("is_active"));
-            obj.setObserverId((Long) row.get("sender_id"));
-            User observer = userService.getUser(obj.getObserverId(), jdbcTemplate);
-            obj.setObserverName(observer.getFirstName() + " " + observer.getLastName());
-            obj.setRequesterId(usr.getId());
-            obj.setRequesterName(usr.getFirstName() + " " + usr.getLastName());
-            obj.parseJSONString((String) row.get("payload"));
-            obj.setSkillName(adminService.getSkill(obj.getSkillId(), jdbcTemplate).getSkillName());
-
+            obj.init((Long) row.get("id"), (Boolean) row.get("is_active"), usr.getId(), usr.fetchFullName(), senderId, 
+                sender.fetchFullName(), (String) row.get("payload"));
             notifications.add(obj);
         }
 
@@ -174,15 +163,15 @@ public class NotificationServiceImpl implements NotificationService {
         String query = "SELECT * FROM " + Constants.TABLE_NOTIFICATIONS + " WHERE id = ?";
         Map<String, Object> row = jdbcTemplate.queryForMap(query, id);
         
+        Long senderId = (Long) row.get("sender_id");
+        Long recevrId = (Long) row.get("receiver_id");
+        User sender = userService.getUser(senderId, jdbcTemplate);
+        User recevr = userService.getUser(recevrId, jdbcTemplate);
+        String recevrName = recevr == null ? "" : recevr.fetchFullName();
+        
         ObservationRequestNotification obj = new ObservationRequestNotification();
-
-        User requester = userService.getUser((Long) row.get("sender_id"), jdbcTemplate);
-        obj.setId((Long) row.get("id"));
-        obj.setActive((Boolean) row.get("is_active"));
-        obj.setRequesterName(requester.getFirstName() + " " + requester.getLastName());
-        obj.setRequesterId(requester.getId());
-        obj.parseJSONString((String) row.get("payload"));
-        obj.setSkillName(adminService.getSkill(obj.getSkillId(), jdbcTemplate).getSkillName());
+        obj.init((Long) row.get("id"), (Boolean) row.get("is_active"), recevr.getId(), recevrName, sender.getId(), 
+            sender.fetchFullName(), (String) row.get("payload"));
 
         return obj;
     }

@@ -9,14 +9,18 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ObservationResponseNotification extends Notification {
-    private Long skillId;
-    private String skillName;
+
+    private static final String EPISODE_ID_KEY = "episodeId";
+    private static final String COMMENT_KEY = "comment";
+    private static final String IS_ACCEPTED_KEY = "isAccepted";
+
+    private Long episodeId;
     private String comment;
     private Boolean isAccepted;
 
     @Override
     public int getType() {
-        return NotificationType.ObservationResponse;    
+        return NotificationType.ObservationResponse;
     }
 
     @Override
@@ -24,10 +28,9 @@ public class ObservationResponseNotification extends Notification {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, String> map = new HashMap<>();
         try {
-            map.put("skillId", skillId.toString());
-            map.put("comment", comment);
-            map.put("isAccepted", isAccepted.toString());
-            // convert map to JSON string
+            map.put(EPISODE_ID_KEY, episodeId.toString());
+            map.put(COMMENT_KEY, comment);
+            map.put(IS_ACCEPTED_KEY, isAccepted.toString());
             return mapper.writeValueAsString(map);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -39,30 +42,21 @@ public class ObservationResponseNotification extends Notification {
     public void parseJSONString(String payload) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            // convert JSON string to Map
             Map<String, String> map = mapper.readValue(payload, new TypeReference<Map<String, String>>(){});
-            setSkillId(Long.parseLong(map.get("skillId")));
-            setComment(map.get("comment"));
-            setIsAccepted(Boolean.parseBoolean(map.get("isAccepted")));
+            setEpisodeId(Long.parseLong(map.get(EPISODE_ID_KEY)));
+            setComment(map.get(COMMENT_KEY));
+            setIsAccepted(Boolean.parseBoolean(map.get(IS_ACCEPTED_KEY)));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public Long getSkillId() {
-        return skillId;
+    public Long getEpisodeId() {
+        return episodeId;
     }
 
-    public void setSkillId(Long skillId) {
-        this.skillId = skillId;
-    }
-
-    public String getSkillName() {
-        return skillName;
-    }
-
-    public void setSkillName(String skillName) {
-        this.skillName = skillName;
+    public void setEpisodeId(Long episodeId) {
+        this.episodeId = episodeId;
     }
 
     public String getComment() {

@@ -43,8 +43,7 @@ public class SkillValidationNotification extends Notification {
         ObjectMapper mapper = new ObjectMapper();
         try {
             // convert JSON string to Map
-            Map<String, String> map = mapper.readValue(payload, new TypeReference<Map<String, String>>() {
-            });
+            Map<String, String> map = mapper.readValue(payload, new TypeReference<Map<String, String>>() {});
             setSkillId(Long.parseLong(map.get("skillId")));
             setEpisodeId(Long.parseLong(map.get("episodeId")));
             setComment(map.get("comment"));

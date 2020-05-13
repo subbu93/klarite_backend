@@ -4,10 +4,10 @@ abstract public class Notification {
     private Long id;
     private Boolean active;
     private int type;
-    private Long requesterId;
-    private String requesterName;
-    private Long observerId;
-    private String observerName;
+    private Long senderId;
+    private String senderName;
+    private Long receiverId;
+    private String receiverName;
 
     public Long getId() {
         return id;
@@ -33,36 +33,46 @@ abstract public class Notification {
         this.type = type;
     }
 
-    public Long getRequesterId() {
-        return requesterId;
+    public Long getSenderId() {
+        return senderId;
     }
 
-    public void setRequesterId(Long requesterId) {
-        this.requesterId = requesterId;
+    public void setSenderId(Long senderId) {
+        this.senderId = senderId;
     }
 
-    public String getRequesterName() {
-        return requesterName;
+    public String getSenderName() {
+        return senderName;
     }
 
-    public void setRequesterName(String requesterName) {
-        this.requesterName = requesterName;
+    public void setSenderName(String requesterName) {
+        this.senderName = requesterName;
     }
 
-    public Long getObserverId() {
-        return observerId;
+    public Long getReceiverId() {
+        return receiverId;
     }
 
-    public void setObserverId(Long observerId) {
-        this.observerId = observerId;
+    public void setReceiverId(Long observerId) {
+        this.receiverId = observerId;
     }
 
-    public String getObserverName() {
-        return observerName;
+    public String getReceiverName() {
+        return receiverName;
     }
 
-    public void setObserverName(String observerName) {
-        this.observerName = observerName;
+    public void setReceiverName(String observerName) {
+        this.receiverName = observerName;
+    }
+
+    public void init(Long id, Boolean isActive, Long receiverId, String receiverName, Long senderId, String senderName, String payload) {
+        setId(id);
+        setActive(isActive);
+        setReceiverId(receiverId);
+        setReceiverName(receiverName);
+        setSenderId(senderId);
+        setSenderName(senderName);
+        parseJSONString(payload);
     }
 
     public abstract String fetchPayload();

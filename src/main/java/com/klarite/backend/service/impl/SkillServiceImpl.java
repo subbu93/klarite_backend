@@ -4,7 +4,10 @@ import com.klarite.backend.Constants;
 import com.klarite.backend.dto.*;
 import com.klarite.backend.dto.Notification.NotificationType;
 import com.klarite.backend.dto.Notification.SkillValidationNotification;
+import com.klarite.backend.service.AdminService;
 import com.klarite.backend.service.SkillService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.SQLWarningException;
@@ -21,6 +24,8 @@ import java.util.Map;
 
 @Service
 public class SkillServiceImpl implements SkillService {
+    @Autowired
+    private AdminService adminService;
 
     @Override
     public List<SkillAssignment> getAllAssignedSkills(JdbcTemplate jdbcTemplate) {
@@ -381,7 +386,7 @@ public class SkillServiceImpl implements SkillService {
 
     @Override
     public List<Episode> getAllEpisodes(Long userId, Long skillId, JdbcTemplate jdbcTemplate) {
-        String query = "SELECT * FROM episodes WHERE user_id = $user";
+        String query = "SELECT * FROM " + Constants.TABLE_EPISODES + " WHERE user_id = $user";
         query = query.replace("$user", userId.toString());
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
@@ -390,7 +395,7 @@ public class SkillServiceImpl implements SkillService {
 
     @Override
     public Episode getEpisode(Long episodeId, JdbcTemplate jdbcTemplate) {
-        String query = "SELECT * FROM episodes WHERE id = $id";
+        String query = "SELECT * FROM " + Constants.TABLE_EPISODES + " WHERE id = $id";
         query = query.replace("$id", episodeId.toString());
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
@@ -408,10 +413,10 @@ public class SkillServiceImpl implements SkillService {
 
             Long episode_id = (Long) row.get("id");
             if (skillId != null) {
-                query = "SELECT * FROM skill_episodes WHERE episode_id = $e_id  AND skill_id = $skill";
+                query = "SELECT * FROM " + Constants.TABLE_SKILL_EPISODES + " WHERE episode_id = $e_id  AND skill_id = $skill";
                 query = query.replace("$e_id", episode_id.toString()).replace("$skill", skillId.toString());
             } else {
-                query = "SELECT * FROM skill_episodes WHERE episode_id = $e_id";
+                query = "SELECT * FROM " + Constants.TABLE_SKILL_EPISODES + " WHERE episode_id = $e_id";
                 query = query.replace("$e_id", episode_id.toString());
             }
 
@@ -428,6 +433,7 @@ public class SkillServiceImpl implements SkillService {
                     skillEpisode.setSkillId((Long) new_row.get("skill_id"));
                     skillEpisode.setObserved((boolean) new_row.get("is_observed"));
                     skillEpisode.setObserverId((Long) new_row.get("observer_id"));
+                    skillEpisode.setSkillName(adminService.getSkill(skillEpisode.getSkillId(), jdbcTemplate).getSkillName());
                     obj.getEpisodes().add(skillEpisode);
                 }
                 skillEpisodes.add(obj);

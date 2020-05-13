@@ -247,24 +247,28 @@ public class UserServiceImpl implements UserService {
         deleteExisitingEpisodes(episodeId, jdbcTemplate);
 
         String query = "INSERT INTO" + Constants.TABLE_SKILL_EPISODES + "VALUES(?, ?, ?, ?);";
+        ObservationRequestNotification orn = new ObservationRequestNotification();
+        orn.setEpisodeId(episodeId);
+        User usr = getUser(userId, jdbcTemplate);
         for (SkillEpisode skillEpisode : skillEpisodeList) {
             if (!skillEpisode.isObserved() || skillEpisode.getObserverId() == 0)
                 jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(), skillEpisode.isObserved(), null);
             else
                 jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(), skillEpisode.isObserved(), skillEpisode.getObserverId());
-
+            
             if (skillEpisode.isObserved()) {
-                User usr = getUser(userId, jdbcTemplate);
-                ObservationRequestNotification orn = new ObservationRequestNotification();
-                String payload = orn.fetchPayload();
-                query = "INSERT INTO" + Constants.TABLE_NOTIFICATIONS + "(cost_center_id, business_unit_id, "
-                        + "sender_id, payload, type, date, time, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
-                java.util.Date date = new java.util.Date();
-                String dateStr = (new SimpleDateFormat("yyyy-MM-dd")).format(date);
-                String timeStr = (new SimpleDateFormat("hh:mm:ss")).format(date);
-                jdbcTemplate.update(query, usr.getCostCenterId(), usr.getBusinessUnitId(), userId, payload,
-                    NotificationType.ObservationRequest, dateStr, timeStr, true);
+                orn.addSkillId(skillEpisode.getSkillId());
             }
+        }
+        if (orn.getSkills().size() > 0) {
+            String payload = orn.fetchPayload();
+            query = "INSERT INTO" + Constants.TABLE_NOTIFICATIONS + "(cost_center_id, business_unit_id, "
+                    + "sender_id, payload, type, date, time, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+            java.util.Date date = new java.util.Date();
+            String dateStr = (new SimpleDateFormat("yyyy-MM-dd")).format(date);
+            String timeStr = (new SimpleDateFormat("hh:mm:ss")).format(date);
+            jdbcTemplate.update(query, usr.getCostCenterId(), usr.getBusinessUnitId(), userId, payload,
+                NotificationType.ObservationRequest, dateStr, timeStr, true);
         }
     }
 
