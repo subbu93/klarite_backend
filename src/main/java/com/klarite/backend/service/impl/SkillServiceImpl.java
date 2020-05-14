@@ -2,9 +2,9 @@ package com.klarite.backend.service.impl;
 
 import com.klarite.backend.Constants;
 import com.klarite.backend.dto.*;
-import com.klarite.backend.dto.Notification.NotificationType;
 import com.klarite.backend.dto.Notification.SkillValidationNotification;
 import com.klarite.backend.service.AdminService;
+import com.klarite.backend.service.NotificationService;
 import com.klarite.backend.service.SkillService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +25,8 @@ import java.util.Map;
 public class SkillServiceImpl implements SkillService {
     @Autowired
     private AdminService adminService;
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     public List<SkillAssignment> getAllAssignedSkills(JdbcTemplate jdbcTemplate) {
@@ -292,6 +293,13 @@ public class SkillServiceImpl implements SkillService {
     }
 
     @Override
+    public ResponseEntity<Object> setObserverId(Long episodeId, Long observerId, JdbcTemplate jdbcTemplate) {
+        String query = "UPDATE " + Constants.TABLE_SKILL_EPISODES + "SET observer_id = ? WHERE episode_id = ? AND is_observed = 1";
+        jdbcTemplate.update(query, observerId, episodeId);
+        return new ResponseEntity<>("Stored", HttpStatus.CREATED);
+    }
+
+    @Override
     public ResponseEntity<Object> saveSkillValidation(List<ValidationData> validationDataList, JdbcTemplate jdbcTemplate) {
         String updateSkillEpisodesQuery = "UPDATE " + Constants.TABLE_SKILL_EPISODES +
                 " SET is_validated = ?, is_remediated = ?, comment = ? " +
@@ -316,15 +324,7 @@ public class SkillServiceImpl implements SkillService {
                     orn.setEpisodeId(validationData.getEpisodeId());
                     orn.setSkillId(validationData.getSkillId());
                     orn.setSkillName(validationData.getSkillName());
-                    String payload = orn.fetchPayload();
-                    String query = "INSERT INTO" + Constants.TABLE_NOTIFICATIONS + "(cost_center_id, business_unit_id, "
-                            + "sender_id, receiver_id, payload, type, date, time, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
-                    java.util.Date date = new java.util.Date();
-                    String dateStr = (new SimpleDateFormat("yyyy-MM-dd")).format(date);
-                    String timeStr = (new SimpleDateFormat("hh:mm:ss")).format(date);
-                    jdbcTemplate.update(query, usr.getCostCenterId(), usr.getBusinessUnitId(),
-                            validationData.getObserverId(), validationData.getUserId(), payload,
-                            NotificationType.SkillValidation, dateStr, timeStr, true);
+                    notificationService.add(orn, usr, validationData.getUserId(), jdbcTemplate);
                 }
             }
             return new ResponseEntity<>("Stored", HttpStatus.CREATED);
@@ -375,8 +375,8 @@ public class SkillServiceImpl implements SkillService {
 
     private Integer getEpisodeCount(Long skillId, Long userId, JdbcTemplate jdbcTemplate) {
         String query = "SELECT Count(*) AS count " +
-                "FROM   skill_episodes " +
-                "WHERE  skill_id = ? " +
+                "FROM  " + Constants.TABLE_SKILL_EPISODES +
+                " WHERE  skill_id = ? " +
                 "       AND episode_id IN (SELECT id " +
                 "                          FROM   episodes " +
                 "                          WHERE  user_id = ?); ";

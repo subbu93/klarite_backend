@@ -18,6 +18,7 @@ public class ObservationRequestNotification extends Notification {
     
     private Long episodeId;
     private Set<Long> skills;
+    private String skillNames;
 
     @Override
     public int getType() {
@@ -71,5 +72,13 @@ public class ObservationRequestNotification extends Notification {
 
     public void setSkills(Set<Long> skills) {
         this.skills = skills;
+    }
+
+    public String getSkillNames() {
+        return skillNames;
+    }
+
+    public void setSkillNames(String skillNames) {
+        this.skillNames = skillNames;
     }
 }

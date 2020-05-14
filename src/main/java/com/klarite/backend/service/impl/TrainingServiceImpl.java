@@ -3,7 +3,13 @@ package com.klarite.backend.service.impl;
 import com.klarite.backend.Constants;
 import com.klarite.backend.dto.TrainingAssignment;
 import com.klarite.backend.dto.User;
+import com.klarite.backend.dto.Notification.UpcomingTrainingNotification;
+import com.klarite.backend.service.NotificationService;
 import com.klarite.backend.service.TrainingService;
+import com.klarite.backend.service.UserService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,6 +24,11 @@ import java.util.Map;
 
 @Service
 public class TrainingServiceImpl implements TrainingService {
+    @Autowired
+    private NotificationService notificationService;
+    @Autowired 
+    private UserService userService;
+
     @Override
     public List<TrainingAssignment> getAllAssignedTrainings(Long userId, JdbcTemplate jdbcTemplate) {
         String tAssignmentQuery = "SELECT * FROM " + Constants.TABLE_T_ASSIGNMENTS;
@@ -76,6 +87,25 @@ public class TrainingServiceImpl implements TrainingService {
             trainingAssignments.add(obj);
         }
         return trainingAssignments;
+    }
+
+    @Override
+    public TrainingAssignment getAssignmentDetails(Long assignmentId, JdbcTemplate jdbcTemplate) {
+        try {
+        String query = "SELECT training_id, date, start_time, location from " + Constants.TABLE_T_ASSIGNMENTS + "where id = ?";
+        Map<String, Object> row = jdbcTemplate.queryForMap(query, assignmentId);
+        TrainingAssignment assignment = new TrainingAssignment();
+        assignment.setAssignmentId(assignmentId);
+        assignment.setLocation((String) row.get("location"));
+        assignment.setDate((Date) row.get("date"));
+        assignment.setStartTime((Time) row.get("start_time"));
+        query = "SELECT name FROM" + Constants.TABLE_TRAININGS + "WHERE id = ?";
+        row = jdbcTemplate.queryForMap(query, (Long) row.get("training_id"));
+        assignment.setTrainingName((String) row.get("name"));
+        return assignment;
+        } catch (DataAccessException e) {
+            return null;
+        }
     }
 
     @Override
@@ -183,6 +213,10 @@ public class TrainingServiceImpl implements TrainingService {
 
         for (Long userId : trainingAssignment.getAssignedUserIds()) {
             jdbcTemplate.update(insertTrainingAssignmentQuery, assignmentId, userId);
+            UpcomingTrainingNotification notification = new UpcomingTrainingNotification();
+            notification.setTrainingAssignmentId(assignmentId);
+            User usr = userService.getUser(userId, false, jdbcTemplate);    //todo: this should be replaced with admin id
+            notificationService.add(notification, usr, userId, jdbcTemplate);
         }
     }
 

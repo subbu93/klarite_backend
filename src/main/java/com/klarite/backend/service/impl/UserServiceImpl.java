@@ -4,11 +4,13 @@ import com.klarite.backend.Constants;
 import com.klarite.backend.dto.Episode;
 import com.klarite.backend.dto.SkillEpisode;
 import com.klarite.backend.dto.User;
-import com.klarite.backend.dto.Notification.NotificationType;
 import com.klarite.backend.dto.Notification.ObservationRequestNotification;
+import com.klarite.backend.service.NotificationService;
 import com.klarite.backend.service.UserService;
 
 import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -22,7 +24,6 @@ import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -30,6 +31,9 @@ import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService {
+    @Autowired
+    private NotificationService notificationService;
+
     @Override
     public ResponseEntity<Object> addSkillEpisode(Episode episode, JdbcTemplate jdbcTemplate) {
         try {
@@ -243,7 +247,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void insertSkillEpisodes(Long userId, long episodeId, List<SkillEpisode> skillEpisodeList,
-                                     JdbcTemplate jdbcTemplate) {
+                                     JdbcTemplate jdbcTemplate) throws DataAccessException {
         deleteExisitingEpisodes(episodeId, jdbcTemplate);
 
         String query = "INSERT INTO" + Constants.TABLE_SKILL_EPISODES + "VALUES(?, ?, ?, ?);";
@@ -261,14 +265,7 @@ public class UserServiceImpl implements UserService {
             }
         }
         if (orn.getSkills().size() > 0) {
-            String payload = orn.fetchPayload();
-            query = "INSERT INTO" + Constants.TABLE_NOTIFICATIONS + "(cost_center_id, business_unit_id, "
-                    + "sender_id, payload, type, date, time, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
-            java.util.Date date = new java.util.Date();
-            String dateStr = (new SimpleDateFormat("yyyy-MM-dd")).format(date);
-            String timeStr = (new SimpleDateFormat("hh:mm:ss")).format(date);
-            jdbcTemplate.update(query, usr.getCostCenterId(), usr.getBusinessUnitId(), userId, payload,
-                NotificationType.ObservationRequest, dateStr, timeStr, true);
+            notificationService.add(orn, usr, null, jdbcTemplate);
         }
     }
 

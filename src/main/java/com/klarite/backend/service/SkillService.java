@@ -16,6 +16,8 @@ public interface SkillService {
 
     ResponseEntity<Object> deleteAssignment(Long id, JdbcTemplate jdbcTemplate);
 
+    ResponseEntity<Object> setObserverId(Long episodeId, Long observerId, JdbcTemplate jdbcTemplate);
+
     List<CostCenter> getCostCenters(JdbcTemplate jdbcTemplate);
 
     List<BusinessUnit> getBusinessUnits(JdbcTemplate jdbcTemplate);
