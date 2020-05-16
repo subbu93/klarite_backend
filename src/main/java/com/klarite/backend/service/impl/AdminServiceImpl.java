@@ -55,7 +55,7 @@ public class AdminServiceImpl implements AdminService {
                 "      ,sk.threshold" +
                 "      ,t.name as Training_prerequisite" +
                 "      ,t.id as training_id" +
-                "     FROM skills as sk, trainings as t" +
+                "     FROM " + Constants.TABLE_SKILLS + " as sk, " + Constants.TABLE_TRAININGS + " as t" +
                 "     WHERE sk.id = ? AND " +
                 "      t.id = sk.training_prerequisite_id" +
                 "      AND sk.soft_delete = 0";
