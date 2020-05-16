@@ -37,9 +37,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<Object> addSkillEpisode(Episode episode, JdbcTemplate jdbcTemplate) {
         try {
-            String query = "INSERT INTO" + Constants.TABLE_EPISODES + "VALUES(?, ?, ?, ?); SELECT SCOPE_IDENTITY() as id;";
+            String query = "INSERT INTO" + Constants.TABLE_EPISODES + "VALUES(?, ?, ?); SELECT SCOPE_IDENTITY() as id;";
             Map<String, Object> row = jdbcTemplate.queryForMap(query, episode.getUserId(), episode.getDate(),
-                    episode.getMrn(), episode.isAudited());
+                    episode.getMrn());
             BigDecimal episodeId = (BigDecimal) row.get("id");
             insertSkillEpisodes(episode.getUserId(), episodeId.longValue(), episode.getEpisodes(), jdbcTemplate);
             return new ResponseEntity<>("Stored", HttpStatus.CREATED);
@@ -250,15 +250,15 @@ public class UserServiceImpl implements UserService {
                                      JdbcTemplate jdbcTemplate) throws DataAccessException {
         deleteExisitingEpisodes(episodeId, jdbcTemplate);
 
-        String query = "INSERT INTO" + Constants.TABLE_SKILL_EPISODES + "VALUES(?, ?, ?, ?);";
+        String query = "INSERT INTO" + Constants.TABLE_SKILL_EPISODES + "VALUES(?, ?, ?, ?, ?, ?, ?);";
         ObservationRequestNotification orn = new ObservationRequestNotification();
         orn.setEpisodeId(episodeId);
         User usr = getUser(userId, jdbcTemplate);
         for (SkillEpisode skillEpisode : skillEpisodeList) {
             if (!skillEpisode.isObserved() || skillEpisode.getObserverId() == 0)
-                jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(), skillEpisode.isObserved(), null);
+                jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(), skillEpisode.isObserved(), null, 0, 0, null);
             else
-                jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(), skillEpisode.isObserved(), skillEpisode.getObserverId());
+                jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(), skillEpisode.isObserved(), skillEpisode.getObserverId(), 0, 0, null);
             
             if (skillEpisode.isObserved()) {
                 orn.addSkillId(skillEpisode.getSkillId());
