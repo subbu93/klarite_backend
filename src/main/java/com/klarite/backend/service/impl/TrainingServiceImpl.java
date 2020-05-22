@@ -174,6 +174,7 @@ public class TrainingServiceImpl implements TrainingService {
                 user.setBusinessUnitName((String) row.get("business_unit"));
                 user.setCostCenterName((String) row.get("cost_center"));
                 user.setUrl((String) row.get("image_url"));
+                user.setFirstLogin((Boolean) row.get("first_time_user"));
                 user.setTrainingAttended((boolean) row.get("attended"));
 
                 users.add(user);

@@ -30,6 +30,8 @@ public class Constants {
     public static final String MSG_DELETE_SUCCESS = "Item deleted successfully";
     public static final String MSG_DELETE_FAILED = "Failed to delete item";
     public static final String MSG_UNAUTHORIZED = "User is not logged in";
+    public static final String MSG_CURRENT_PSWD_INVLAID = "Your password was incorrect";
+    public static final String MSG_PSWD_RULE_VOILATED = "New password should be atleast 6 characters long";
 
     // directories
     public static final String DIRECTORY_UPLOADS = "uploads";

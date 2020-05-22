@@ -11,6 +11,7 @@ import com.klarite.backend.service.UserService;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -181,6 +182,7 @@ public class UserServiceImpl implements UserService {
             user.setUrl((String) row.get("image_url"));
             user.setTrainer((boolean) row.get("is_trainer"));
             user.setRole((String) row.get("role"));
+            user.setFirstLogin((Boolean) row.get("first_time_user"));
 
             return user;
         } catch (Exception e) {
@@ -215,6 +217,25 @@ public class UserServiceImpl implements UserService {
         try {
             jdbcTemplate.update(query, userId);
             return new ResponseEntity<>("Deleted User", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    @Override
+    public ResponseEntity<Object> changePswd(Long userId, String oldPswd, String newPswd, JdbcTemplate jdbcTemplate) {
+        try {
+            if (validateNewPswd(newPswd)) {
+                String query = "SELECT * FROM" + Constants.TABLE_USERS + " WHERE id = ? and password = ?";
+                jdbcTemplate.queryForMap(query, userId, oldPswd);
+                query = "UPDATE " + Constants.TABLE_USERS + "SET password = ?, first_time_user = 0 WHERE id = ?";
+                jdbcTemplate.update(query, newPswd, userId);
+                return new ResponseEntity<>(Constants.MSG_UPDATED_SUCCESSFULLY, HttpStatus.CREATED);
+            } else
+                return new ResponseEntity<>(Constants.MSG_PSWD_RULE_VOILATED, HttpStatus.BAD_REQUEST);
+        } catch (EmptyResultDataAccessException e) {
+            return new ResponseEntity<>(Constants.MSG_CURRENT_PSWD_INVLAID, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -306,5 +327,9 @@ public class UserServiceImpl implements UserService {
     private String getTempFileName() {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         return timestamp.getTime() + ".jpg";
+    }
+
+    private boolean validateNewPswd(String newPswd) {
+        return newPswd.length() >= 6;
     }
 }
