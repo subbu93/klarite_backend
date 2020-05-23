@@ -19,6 +19,7 @@ public class User {
     private String token;
     private String role;
     private String imageData;
+    private Boolean firstLogin;
 
     public Long getId() {
         return id;
@@ -150,5 +151,13 @@ public class User {
 
     public String fetchFullName() {
         return getFirstName() + " " + getLastName();
+    }
+
+    public Boolean getFirstLogin() {
+        return firstLogin;
+    }
+
+    public void setFirstLogin(Boolean firstLogin) {
+        this.firstLogin = firstLogin;
     }
 }

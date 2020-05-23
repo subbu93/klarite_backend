@@ -25,4 +25,6 @@ public interface UserService {
     ResponseEntity<Object> deleteUser(Long userId, JdbcTemplate jdbcTemplate);
 
     ResponseEntity<Object> updateProfilePic(Long userId, String imageData, JdbcTemplate jdbcTemplate);
+
+    ResponseEntity<Object> changePswd(Long userId, String oldPswd, String newPswd, JdbcTemplate jdbcTemplate);
 }

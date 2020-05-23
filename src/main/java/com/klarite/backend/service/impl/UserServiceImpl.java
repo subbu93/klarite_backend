@@ -11,6 +11,7 @@ import com.klarite.backend.service.UserService;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -181,6 +182,7 @@ public class UserServiceImpl implements UserService {
             user.setUrl((String) row.get("image_url"));
             user.setTrainer((boolean) row.get("is_trainer"));
             user.setRole((String) row.get("role"));
+            user.setFirstLogin((Boolean) row.get("first_time_user"));
 
             return user;
         } catch (Exception e) {
@@ -220,6 +222,25 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+
+    @Override
+    public ResponseEntity<Object> changePswd(Long userId, String oldPswd, String newPswd, JdbcTemplate jdbcTemplate) {
+        try {
+            if (validateNewPswd(newPswd)) {
+                String query = "SELECT * FROM" + Constants.TABLE_USERS + " WHERE id = ? and password = ?";
+                jdbcTemplate.queryForMap(query, userId, oldPswd);
+                query = "UPDATE " + Constants.TABLE_USERS + "SET password = ?, first_time_user = 0 WHERE id = ?";
+                jdbcTemplate.update(query, newPswd, userId);
+                return new ResponseEntity<>(Constants.MSG_UPDATED_SUCCESSFULLY, HttpStatus.CREATED);
+            } else
+                return new ResponseEntity<>(Constants.MSG_PSWD_RULE_VOILATED, HttpStatus.BAD_REQUEST);
+        } catch (EmptyResultDataAccessException e) {
+            return new ResponseEntity<>(Constants.MSG_CURRENT_PSWD_INVLAID, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
     private ResponseEntity<Object> updateUser(User user, JdbcTemplate jdbcTemplate) {
         String updateUser = "UPDATE " + Constants.TABLE_USERS +
                 " SET osu_id = ?" +
@@ -250,15 +271,15 @@ public class UserServiceImpl implements UserService {
                                      JdbcTemplate jdbcTemplate) throws DataAccessException {
         deleteExisitingEpisodes(episodeId, jdbcTemplate);
 
-        String query = "INSERT INTO" + Constants.TABLE_SKILL_EPISODES + "VALUES(?, ?, ?, ?);";
+        String query = "INSERT INTO" + Constants.TABLE_SKILL_EPISODES + "VALUES(?, ?, ?, ?, ?, ?, ?);";
         ObservationRequestNotification orn = new ObservationRequestNotification();
         orn.setEpisodeId(episodeId);
         User usr = getUser(userId, jdbcTemplate);
         for (SkillEpisode skillEpisode : skillEpisodeList) {
             if (!skillEpisode.isObserved() || skillEpisode.getObserverId() == 0)
-                jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(), skillEpisode.isObserved(), null);
+                jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(), skillEpisode.isObserved(), null, 0, 0, null);
             else
-                jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(), skillEpisode.isObserved(), skillEpisode.getObserverId());
+                jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(), skillEpisode.isObserved(), skillEpisode.getObserverId(), 0, 0, null);
             
             if (skillEpisode.isObserved()) {
                 orn.addSkillId(skillEpisode.getSkillId());
@@ -306,6 +327,10 @@ public class UserServiceImpl implements UserService {
     private String getTempFileName() {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         return timestamp.getTime() + ".jpg";
+    }
+
+    private boolean validateNewPswd(String newPswd) {
+        return newPswd.length() >= 6;
     }
 
     public List<User> getUsersWithBusinessUnitIdAndCostCenterId(Integer businessUnitId, Integer costCenterId,

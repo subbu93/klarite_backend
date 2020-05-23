@@ -73,4 +73,16 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
+
+    @PostMapping("/user_services/change_password")
+    public ResponseEntity<Object> changePswd(@RequestHeader(value = "token") String token,
+                                             @RequestParam(value = "userId") Long userId,
+                                             @RequestParam(value = "oldPswd") String oldPswd,
+                                             @RequestParam(value = "newPswd") String newPswd) {
+        if (authenticationService.isTokenValid(token, jdbcTemplate)) {
+            return userService.changePswd(userId, oldPswd, newPswd, jdbcTemplate);
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+    }
 }
