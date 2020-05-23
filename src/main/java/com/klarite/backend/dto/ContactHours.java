@@ -7,6 +7,7 @@ public class ContactHours {
     private String position;
     private Integer ceHrs;
     private Integer timePeriod;
+    private Integer certificationId;
 
     public Long getId() {
         return id;
@@ -54,5 +55,13 @@ public class ContactHours {
 
     public void setTimePeriod(Integer timePeriod) {
         this.timePeriod = timePeriod;
+    }
+
+    public Integer getCertificationId() {
+        return certificationId;
+    }
+
+    public void setCertificationId(Integer certificationId) {
+        this.certificationId = certificationId;
     }
 }

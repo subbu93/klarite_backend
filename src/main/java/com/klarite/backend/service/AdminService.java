@@ -32,5 +32,5 @@ public interface AdminService {
 
     ResponseEntity<Object> addContactHours(ContactHours ce, JdbcTemplate jdbcTemplate);
 
-    ContactHours getCeHrs(String state, String title, String position, JdbcTemplate jdbcTemplate);
+    ContactHours getCeHrs(String state, Integer certificationId, JdbcTemplate jdbcTemplate);
 }

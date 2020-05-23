@@ -1,12 +1,14 @@
 package com.klarite.backend.controller;
 
-import com.klarite.backend.dto.ContinuedEducation;
-import com.klarite.backend.dto.ContinuedEducationEvents;
+import com.klarite.backend.dto.*;
 import com.klarite.backend.service.ContactHourService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -35,5 +37,16 @@ public class ContactHourController {
     @PostMapping("/ce/edit")
     public ResponseEntity<Object> edit(@RequestBody ContinuedEducation ce) {
         return contactHourService.edit(ce, jdbcTemplate);
+    }
+
+    @GetMapping("/ce/get-certification")
+    public List<Certification> getAllCertifications() {
+        return contactHourService.getAllCertifications(jdbcTemplate);
+    }
+
+    @GetMapping("/ce/get-ce-report")
+    public List<CeReport> getCeReport(@RequestParam(value = "businessUnitId") Integer businessUnitId,
+                                      @RequestParam(value = "costCenterId") Integer costCenterId) {
+        return contactHourService.getCeReport(businessUnitId, costCenterId, jdbcTemplate);
     }
 }

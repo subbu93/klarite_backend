@@ -20,6 +20,7 @@ public class Constants {
     public static final String TABLE_TRAINING_ASSIGNMENTS = " training_assignments ";
     public static final String TABLE_TOKENS = " tokens ";
     public static final String TABLE_NOTIFICATIONS = " notifications ";
+    public static final String CERTIFICATIONS = "certifications";
 
     // return msgs
     public static final String MSG_MARK_ATTENDANCE_SUCCESS = "Attendance marked successfully";

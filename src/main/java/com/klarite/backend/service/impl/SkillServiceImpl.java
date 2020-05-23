@@ -377,6 +377,7 @@ public class SkillServiceImpl implements SkillService {
         String query = "SELECT Count(*) AS count " +
                 "FROM  " + Constants.TABLE_SKILL_EPISODES +
                 " WHERE  skill_id = ? " +
+                "       AND is_validated = 1" +
                 "       AND episode_id IN (SELECT id " +
                 "                          FROM   episodes " +
                 "                          WHERE  user_id = ?); ";

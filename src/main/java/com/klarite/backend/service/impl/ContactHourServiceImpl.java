@@ -1,9 +1,7 @@
 package com.klarite.backend.service.impl;
 
 import com.klarite.backend.Constants;
-import com.klarite.backend.dto.ContinuedEducation;
-import com.klarite.backend.dto.ContinuedEducationEvents;
-import com.klarite.backend.dto.Training;
+import com.klarite.backend.dto.*;
 import com.klarite.backend.service.ContactHourService;
 
 import org.apache.commons.io.FileUtils;
@@ -19,10 +17,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ContactHourServiceImpl implements ContactHourService {
@@ -97,6 +92,60 @@ public class ContactHourServiceImpl implements ContactHourService {
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @Override
+    public List<Certification> getAllCertifications(JdbcTemplate jdbcTemplate) {
+        String certificationQuery = "SELECT * FROM " + Constants.CERTIFICATIONS;
+        List<Certification> certifications = new ArrayList<>();
+        try {
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(certificationQuery);
+            for (Map<String, Object> row: rows) {
+                Certification certification = new Certification();
+
+                certification.setId((Integer) row.get("id"));
+                certification.setName((String) row.get("name"));
+                certification.setDescription((String) row.get("description"));
+
+                certifications.add(certification);
+            }
+
+            return certifications;
+        } catch (Exception e) {
+            return certifications;
+        }
+    }
+
+    @Override
+    public List<CeReport> getCeReport(Integer businessUnitId, Integer costCenterId, JdbcTemplate jdbcTemplate) {
+        UserServiceImpl userService = new UserServiceImpl();
+
+        List<User> users = userService.getUsersWithBusinessUnitIdAndCostCenterId(businessUnitId,
+                costCenterId, jdbcTemplate);
+        List<CeReport> ceReport = new ArrayList<>();
+        for(User user: users) {
+            CeReport temp = new CeReport();
+            ContinuedEducationEvents continuedEducationEvents = getAll(user.getId(), jdbcTemplate);
+            float totalHrs = 0;
+            System.out.println(continuedEducationEvents);
+            if(continuedEducationEvents.getEducation().size() > 0 ||
+                    continuedEducationEvents.getTrainings().size() > 0) {
+                if(continuedEducationEvents.getEducation().size() > 0) {
+                    for (ContinuedEducation e: continuedEducationEvents.getEducation()) {
+                        totalHrs += e.getTotalHours();
+                    }
+                }
+                if(continuedEducationEvents.getTrainings().size() > 0) {
+                    for (Training t: continuedEducationEvents.getTrainings()) {
+                        totalHrs += t.getTotalHours();
+                    }
+                }
+            }
+            temp.setUser(user);
+            temp.setTotalHrs(totalHrs);
+            ceReport.add(temp);
+        }
+        return ceReport;
     }
 
     private List<Training> getTrainingsWithCE(Long userId, JdbcTemplate jdbcTemplate) {

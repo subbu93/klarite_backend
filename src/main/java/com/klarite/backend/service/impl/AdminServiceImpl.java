@@ -300,17 +300,16 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public ContactHours getCeHrs(String state, String title, String position, JdbcTemplate jdbcTemplate) {
+    public ContactHours getCeHrs(String state, Integer certificationId, JdbcTemplate jdbcTemplate) {
         ContactHours ce = new ContactHours();
-        if (state == null || title == null || position == null) {
+        if (state == null || certificationId == null ) {
             return null;
         }
         String query = "SELECT * FROM " + Constants.TABLE_CONTINUED_EDUCATION +
                 "       WHERE state = ?" +
-                "       AND position = ?" +
-                "       AND title = ?";
+                "       AND certification_id = ?";
         try {
-            Map<String, Object> row = jdbcTemplate.queryForMap(query, state, position, title);
+            Map<String, Object> row = jdbcTemplate.queryForMap(query, state, certificationId);
 
             ce.setId((Long) row.get("id"));
             ce.setPosition((String) row.get("position"));
@@ -318,6 +317,7 @@ public class AdminServiceImpl implements AdminService {
             ce.setUserTitle((String) row.get("title"));
             ce.setCeHrs((Integer) row.get("ce_hours"));
             ce.setTimePeriod((Integer) row.get("time_period"));
+            ce.setCertificationId((Integer) row.get("certification_id"));
         } catch (Exception e) {
             System.out.println(e);
             return null;
