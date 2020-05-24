@@ -174,7 +174,8 @@ public class SkillServiceImpl implements SkillService {
                 skill.setId(((Long) row.get("id")));
                 skill.setSkillName((String) row.get("name"));
                 skill.setDescription((String) row.get("description"));
-                skill.setThreshold((Integer) row.get("threshold"));
+                skill.setTotalThreshold((Integer) row.get("total_threshold"));
+                skill.setValidationThreshold((Integer) row.get("validation_threshold"));
                 skill.setSkillTrainingPreRequisite((String) row.get("training_prerequisite"));
                 skill.setTrainingId((Long) row.get("training_id"));
                 skill.setEpisodeCount(getEpisodeCount(skill.getId(), userId, jdbcTemplate));
@@ -233,7 +234,7 @@ public class SkillServiceImpl implements SkillService {
                 temp.setName(user.getFirstName() + " " + user.getLastName());
                 temp.setValue(getEpisodeCount(skillId, user.getId(), jdbcTemplate));
                 Map<String, Long> map = new HashMap<>();
-                map.put("threshold", (long) skill.getThreshold());
+                map.put("threshold", (long) skill.getTotalThreshold());
                 map.put("userId", user.getId());
                 temp.setExtra(map);
 
@@ -253,6 +254,7 @@ public class SkillServiceImpl implements SkillService {
                 "FROM   (SELECT t1.*, " +
                 "               skills.name, " +
                 "               skills.total_threshold " +
+                "               skills.validation_threshold " +
                 "        FROM   (SELECT * " +
                 "                FROM " + Constants.TABLE_SKILL_EPISODES + " se " +
                 "                       INNER JOIN " + Constants.TABLE_EPISODES +

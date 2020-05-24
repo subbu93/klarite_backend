@@ -21,6 +21,7 @@ public class AdminServiceImpl implements AdminService {
                 "      ,sk.name" +
                 "      ,sk.description" +
                 "      ,sk.total_threshold" +
+                "      ,sk.validation_threshold" +
                 "      ,t.name as training_prerequisite" +
                 "      ,t.id as training_id" +
                 "  FROM " + Constants.TABLE_SKILLS + " as sk, " + Constants.TABLE_TRAININGS + " as t" +
@@ -36,7 +37,8 @@ public class AdminServiceImpl implements AdminService {
             obj.setId(((Long) row.get("id")));
             obj.setSkillName((String) row.get("name"));
             obj.setDescription((String) row.get("description"));
-            obj.setThreshold((Integer) row.get("threshold"));
+            obj.setTotalThreshold((Integer) row.get("total_threshold"));
+            obj.setValidationThreshold((Integer) row.get("validation_threshold"));
             obj.setSkillTrainingPreRequisite((String) row.get("training_prerequisite"));
             obj.setTrainingId((Long) row.get("training_id"));
             skills.add(obj);
@@ -50,6 +52,7 @@ public class AdminServiceImpl implements AdminService {
                 "      ,sk.name" +
                 "      ,sk.description" +
                 "      ,sk.total_threshold" +
+                "      ,sk.validation_threshold" +
                 "      ,t.name as Training_prerequisite" +
                 "      ,t.id as training_id" +
                 "     FROM " + Constants.TABLE_SKILLS + " as sk, " + Constants.TABLE_TRAININGS + " as t" +
@@ -64,7 +67,8 @@ public class AdminServiceImpl implements AdminService {
         skill.setId(((Long) row.get("id")));
         skill.setSkillName((String) row.get("name"));
         skill.setDescription((String) row.get("description"));
-        skill.setThreshold((Integer) row.get("threshold"));
+        skill.setTotalThreshold((Integer) row.get("total_threshold"));
+        skill.setValidationThreshold((Integer) row.get("validation_threshold"));
         skill.setSkillTrainingPreRequisite((String) row.get("Training_prerequisite"));
         skill.setTrainingId((Long) row.get("training_id"));
         return skill;
@@ -75,14 +79,17 @@ public class AdminServiceImpl implements AdminService {
         String query = "";
         if (skill.getId() == null) {
             query = "INSERT INTO " + Constants.TABLE_SKILLS +
-                    " (name, description, total_threshold,training_prerequisite_id, soft_delete) " +
+                    " (name, description, total_threshold, validation_threshold, " +
+                    "training_prerequisite_id, soft_delete) " +
                     " VALUES      (?," +
                     "             ?, " +
                     "             ?," +
                     "             ?," +
+                    "             ?," +
                     "             0); ";
             try {
-                jdbcTemplate.update(query, skill.getSkillName(), skill.getDescription(), skill.getThreshold(),
+                jdbcTemplate.update(query, skill.getSkillName(), skill.getDescription(),
+                        skill.getTotalThreshold(), skill.getValidationThreshold(),
                         skill.getTrainingId());
                 ResponseEntity<Object> response = new ResponseEntity<>("Stored", HttpStatus.CREATED);
                 return response;
@@ -91,10 +98,12 @@ public class AdminServiceImpl implements AdminService {
             }
         } else {
             query = "UPDATE " + Constants.TABLE_SKILLS +
-                    " SET name = ?, description= ?, total_threshold = ?, training_prerequisite_id = ? " +
+                    " SET name = ?, description= ?, total_threshold = ?, " +
+                    "validation_threshold = ?, training_prerequisite_id = ? " +
                     " WHERE id = ?;";
             try {
-                jdbcTemplate.update(query, skill.getSkillName(), skill.getDescription(), skill.getThreshold(),
+                jdbcTemplate.update(query, skill.getSkillName(), skill.getDescription(),
+                        skill.getTotalThreshold(), skill.getValidationThreshold(),
                         skill.getTrainingId(), skill.getId());
                 ResponseEntity<Object> response = new ResponseEntity<>("Stored", HttpStatus.CREATED);
                 return response;
