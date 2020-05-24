@@ -20,7 +20,7 @@ public class AdminServiceImpl implements AdminService {
         String query = "SELECT sk.id " +
                 "      ,sk.name" +
                 "      ,sk.description" +
-                "      ,sk.threshold" +
+                "      ,sk.total_threshold" +
                 "      ,t.name as training_prerequisite" +
                 "      ,t.id as training_id" +
                 "  FROM " + Constants.TABLE_SKILLS + " as sk, " + Constants.TABLE_TRAININGS + " as t" +
@@ -49,7 +49,7 @@ public class AdminServiceImpl implements AdminService {
         String query = "SELECT sk.id " +
                 "      ,sk.name" +
                 "      ,sk.description" +
-                "      ,sk.threshold" +
+                "      ,sk.total_threshold" +
                 "      ,t.name as Training_prerequisite" +
                 "      ,t.id as training_id" +
                 "     FROM " + Constants.TABLE_SKILLS + " as sk, " + Constants.TABLE_TRAININGS + " as t" +
@@ -75,7 +75,7 @@ public class AdminServiceImpl implements AdminService {
         String query = "";
         if (skill.getId() == null) {
             query = "INSERT INTO " + Constants.TABLE_SKILLS +
-                    " (name, description, threshold,training_prerequisite_id, soft_delete) " +
+                    " (name, description, total_threshold,training_prerequisite_id, soft_delete) " +
                     " VALUES      (?," +
                     "             ?, " +
                     "             ?," +
@@ -91,7 +91,7 @@ public class AdminServiceImpl implements AdminService {
             }
         } else {
             query = "UPDATE " + Constants.TABLE_SKILLS +
-                    " SET name = ?, description= ?, threshold = ?, training_prerequisite_id = ? " +
+                    " SET name = ?, description= ?, total_threshold = ?, training_prerequisite_id = ? " +
                     " WHERE id = ?;";
             try {
                 jdbcTemplate.update(query, skill.getSkillName(), skill.getDescription(), skill.getThreshold(),

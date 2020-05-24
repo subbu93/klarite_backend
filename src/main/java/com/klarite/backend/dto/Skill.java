@@ -4,7 +4,7 @@ public class Skill {
     private Long id;
     private String skillName;
     private String description;
-    private Integer threshold;
+    private Integer totalThreshold;
     private String skillTrainingPreRequisite;
     private Integer episodeCount;
     private Long trainingId;
@@ -17,6 +17,7 @@ public class Skill {
     public void setId(Long id) {
         this.id = id;
     }
+
 
     public String getSkillName() {
         return skillName;
@@ -35,11 +36,11 @@ public class Skill {
     }
 
     public Integer getThreshold() {
-        return threshold;
+        return totalThreshold;
     }
 
     public void setThreshold(Integer threshold) {
-        this.threshold = threshold;
+        this.totalThreshold = threshold;
     }
 
     public String getSkillTrainingPreRequisite() {
