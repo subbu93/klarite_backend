@@ -1,13 +1,13 @@
 package com.klarite.backend.dto;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 public class ContinuedEducation {
 
     private Long id;
     private Long userId;
     private String name;
-    private Date date;
+    private LocalDate date;
     private boolean isCE;
     private String presenterName;
     private Float totalHours;
@@ -31,11 +31,11 @@ public class ContinuedEducation {
         this.name = name;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

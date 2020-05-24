@@ -1,5 +1,6 @@
 package com.klarite.backend.service;
 
+import com.klarite.backend.dto.Certification;
 import com.klarite.backend.dto.Episode;
 import com.klarite.backend.dto.User;
 import org.springframework.http.ResponseEntity;
@@ -27,4 +28,6 @@ public interface UserService {
     ResponseEntity<Object> updateProfilePic(Long userId, String imageData, JdbcTemplate jdbcTemplate);
 
     ResponseEntity<Object> changePswd(Long userId, String oldPswd, String newPswd, JdbcTemplate jdbcTemplate);
+
+    ResponseEntity<Object> updateCertification(Long userId, List<Certification> certifications, JdbcTemplate jdbcTemplate);
 }

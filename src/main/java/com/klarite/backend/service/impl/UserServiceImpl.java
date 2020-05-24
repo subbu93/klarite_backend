@@ -1,6 +1,7 @@
 package com.klarite.backend.service.impl;
 
 import com.klarite.backend.Constants;
+import com.klarite.backend.dto.Certification;
 import com.klarite.backend.dto.Episode;
 import com.klarite.backend.dto.License;
 import com.klarite.backend.dto.Notification.ObservationRequestNotification;
@@ -25,6 +26,8 @@ import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -130,6 +133,7 @@ public class UserServiceImpl implements UserService {
                 user.setCostCenterName((String) row.get("cost_center"));
                 user.setUrl((String) row.get("image_url"));
                 user.setRole((String) row.get("role"));
+                user.setCertifications(getUserCertifications(user.getId(), jdbcTemplate));
                 user.setTrainer((boolean) row.get("is_trainer"));
                 user.setLicenseList(getUserLicenses(user.getId(), jdbcTemplate));
                 users.add(user);
@@ -137,6 +141,20 @@ public class UserServiceImpl implements UserService {
             return users;
         } catch (Exception e) {
             return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public ResponseEntity<Object> updateCertification(Long userId, List<Certification> certifications, JdbcTemplate jdbcTemplate) {
+        try {
+            deleteCurrentCertifications(userId, jdbcTemplate);
+            String query = "INSERT INTO " + Constants.TABLE_USER_CERTIFICATION + "VALUES (? , ? , ?)";
+            for (Certification certification : certifications) {
+                jdbcTemplate.update(query, userId, certification.getId(), certification.getExpiry());
+            }
+            return new ResponseEntity<>(Constants.MSG_UPDATED_SUCCESSFULLY, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -182,6 +200,7 @@ public class UserServiceImpl implements UserService {
             user.setUrl((String) row.get("image_url"));
             user.setTrainer((boolean) row.get("is_trainer"));
             user.setRole((String) row.get("role"));
+            user.setCertifications(getUserCertifications(user.getId(), jdbcTemplate));
             user.setLicenseList(getUserLicenses(user.getId(), jdbcTemplate));
             user.setFirstLogin((Boolean) row.get("first_time_user"));
 
@@ -375,6 +394,7 @@ public class UserServiceImpl implements UserService {
                 user.setRole((String) row.get("role"));
                 user.setLicenseList(getUserLicenses(user.getId(), jdbcTemplate));
                 user.setTrainer((boolean) row.get("is_trainer"));
+                user.setCertifications(getUserCertifications(user.getId(), jdbcTemplate));
 
                 users.add(user);
             }
@@ -412,7 +432,37 @@ public class UserServiceImpl implements UserService {
         return licenses;
     }
 
-    void insertUserLicenses(Long userId, List<License> licenses, JdbcTemplate jdbcTemplate) {
+    public List<Certification> getUserCertifications(Long userId, JdbcTemplate jdbcTemplate) {
+        String query = "SELECT uc.*, " +
+                "       c.name, " +
+                "       c.description " +
+                "FROM   "+ Constants.TABLE_USER_CERTIFICATION + " AS uc " +
+                "       INNER JOIN "+Constants.TABLE_CERTIFICATIONS + " AS c " +
+                "               ON uc.cert_id = c.id " +
+                "WHERE  uc.user_id = ?";
+
+        List<Certification> certifications = new ArrayList<>();
+
+        try {
+            List<Map<String, Object>> userRows = jdbcTemplate.queryForList(query, userId);
+            for (Map<String, Object> row : userRows) {
+                Certification temp = new Certification();
+
+                temp.setId((Integer) row.get("cert_id"));
+                temp.setName((String) row.get("name"));
+                temp.setDescription((String) row.get("description"));
+                Date date = (Date) row.get("expiry");
+                if (date != null)
+                    temp.setExpiry(date.toLocalDate());
+                certifications.add(temp);
+            }
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return certifications;
+    }
+
+    private void insertUserLicenses(Long userId, List<License> licenses, JdbcTemplate jdbcTemplate) {
         String query = "INSERT INTO " + Constants.TABLE_USER_LICENSE + " VALUES (?,?)";
 
         for (License license: licenses) {
@@ -420,9 +470,14 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    void deleteUserLicense(Long userId, JdbcTemplate jdbcTemplate) {
+    private void deleteUserLicense(Long userId, JdbcTemplate jdbcTemplate) {
         String query = "DELETE FROM " + Constants.TABLE_USER_LICENSE +
                 " WHERE  user_id = ? ";
+        jdbcTemplate.update(query, userId);
+    }
+
+    private void deleteCurrentCertifications(Long userId, JdbcTemplate jdbcTemplate) {
+        String query = "DELETE FROM " + Constants.TABLE_USER_CERTIFICATION + " WHERE  user_id = ? ";
         jdbcTemplate.update(query, userId);
     }
 }

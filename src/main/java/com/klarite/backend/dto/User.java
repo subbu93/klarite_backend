@@ -23,6 +23,7 @@ public class User {
     private String imageData;
     private Boolean firstLogin;
     private List<License> licenseList;
+    private List<Certification> certifications;
 
     public Long getId() {
         return id;
@@ -170,5 +171,13 @@ public class User {
 
     public void setLicenseList(List<License> licenseList) {
         this.licenseList = licenseList;
+    }
+
+    public List<Certification> getCertifications() {
+        return certifications;
+    }
+
+    public void setCertifications(List<Certification> certifications) {
+        this.certifications = certifications;
     }
 }

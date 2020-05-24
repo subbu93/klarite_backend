@@ -29,7 +29,7 @@ public interface AdminService {
 
     ResponseEntity<Object> addContactHours(ContactHours ce, JdbcTemplate jdbcTemplate);
 
-    ContactHours getCeHrs(String state, Integer licenseId, JdbcTemplate jdbcTemplate);
+    ContactHours getCeHrs(String state, Long licenseId, JdbcTemplate jdbcTemplate);
 
     List<License> getLicenses(JdbcTemplate jdbcTemplate);
 }
