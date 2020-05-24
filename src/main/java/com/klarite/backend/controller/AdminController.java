@@ -1,9 +1,6 @@
 package com.klarite.backend.controller;
 
-import com.klarite.backend.dto.ContactHours;
-import com.klarite.backend.dto.Skill;
-import com.klarite.backend.dto.Training;
-import com.klarite.backend.dto.User;
+import com.klarite.backend.dto.*;
 import com.klarite.backend.service.AdminService;
 import com.klarite.backend.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +83,12 @@ public class AdminController {
 
     @GetMapping("/skill_admin/get_ce_hrs")
     public ContactHours getCeHrs(@RequestParam(value = "state") String state,
-                                 @RequestParam(value = "certificationId") Integer certificationId) {
-        return adminService.getCeHrs(state, certificationId, jdbcTemplate);
+                                 @RequestParam(value = "licenseId") Integer licenseId) {
+        return adminService.getCeHrs(state, licenseId, jdbcTemplate);
+    }
+
+    @GetMapping("/getLicenses")
+    public List<License> getLicenses() {
+        return adminService.getLicenses(jdbcTemplate);
     }
 }

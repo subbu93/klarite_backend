@@ -2,6 +2,8 @@ package com.klarite.backend.dto;
 
 import org.apache.commons.text.WordUtils;
 
+import java.util.List;
+
 public class User {
     private Long id;
     private String osuId;
@@ -20,6 +22,7 @@ public class User {
     private String role;
     private String imageData;
     private Boolean firstLogin;
+    private List<License> licenseList;
 
     public Long getId() {
         return id;
@@ -159,5 +162,13 @@ public class User {
 
     public void setFirstLogin(Boolean firstLogin) {
         this.firstLogin = firstLogin;
+    }
+
+    public List<License> getLicenseList() {
+        return licenseList;
+    }
+
+    public void setLicenseList(List<License> licenseList) {
+        this.licenseList = licenseList;
     }
 }

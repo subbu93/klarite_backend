@@ -21,6 +21,8 @@ public class Constants {
     public static final String TABLE_TOKENS = " tokens ";
     public static final String TABLE_NOTIFICATIONS = " notifications ";
     public static final String CERTIFICATIONS = "certifications";
+    public static final String TABLE_LICENSE = "license";
+    public static final String TABLE_USER_LICENSE = "user_license";
 
     // return msgs
     public static final String MSG_MARK_ATTENDANCE_SUCCESS = "Attendance marked successfully";

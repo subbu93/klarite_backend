@@ -2,12 +2,12 @@ package com.klarite.backend.service.impl;
 
 import com.klarite.backend.Constants;
 import com.klarite.backend.dto.Episode;
+import com.klarite.backend.dto.License;
+import com.klarite.backend.dto.Notification.ObservationRequestNotification;
 import com.klarite.backend.dto.SkillEpisode;
 import com.klarite.backend.dto.User;
-import com.klarite.backend.dto.Notification.ObservationRequestNotification;
 import com.klarite.backend.service.NotificationService;
 import com.klarite.backend.service.UserService;
-
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -131,7 +131,7 @@ public class UserServiceImpl implements UserService {
                 user.setUrl((String) row.get("image_url"));
                 user.setRole((String) row.get("role"));
                 user.setTrainer((boolean) row.get("is_trainer"));
-
+                user.setLicenseList(getUserLicenses(user.getId(), jdbcTemplate));
                 users.add(user);
             }
             return users;
@@ -182,6 +182,7 @@ public class UserServiceImpl implements UserService {
             user.setUrl((String) row.get("image_url"));
             user.setTrainer((boolean) row.get("is_trainer"));
             user.setRole((String) row.get("role"));
+            user.setLicenseList(getUserLicenses(user.getId(), jdbcTemplate));
             user.setFirstLogin((Boolean) row.get("first_time_user"));
 
             return user;
@@ -196,12 +197,14 @@ public class UserServiceImpl implements UserService {
             return updateUser(user, jdbcTemplate);
         } else {
             String insertUser = "INSERT INTO " + Constants.TABLE_USERS +
-                    " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,0);";
+                    " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,0);  SELECT SCOPE_IDENTITY() as id;";
             try {
-                jdbcTemplate.update(insertUser, user.getOsuId(), user.getFirstName(), user.getMiddleName(),
+                Map<String, Object> row = jdbcTemplate.queryForMap(insertUser, user.getOsuId(), user.getFirstName(), user.getMiddleName(),
                         user.getLastName(), user.getEmail(), "5f4dcc3b5aa765d61d8327deb882cf99",
-                        user.getCostCenterId(), user.getBusinessUnitId(), "./image8.jpg", user.getRole(),
-                        user.isTrainer(), true);
+                        user.getCostCenterId(), user.getBusinessUnitId(), "./image8.jpg",
+                        user.getRole(),user.isTrainer(), true);
+                BigDecimal userId = (BigDecimal) row.get("id");
+                insertUserLicenses(userId.longValue(), user.getLicenseList(), jdbcTemplate);
                 return new ResponseEntity<>("Updated", HttpStatus.CREATED);
             } catch (Exception e) {
                 return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -215,6 +218,7 @@ public class UserServiceImpl implements UserService {
                 " SET soft_delete = 1 " +
                 " WHERE id = ?";
         try {
+            deleteUserLicense(userId, jdbcTemplate);
             jdbcTemplate.update(query, userId);
             return new ResponseEntity<>("Deleted User", HttpStatus.OK);
         } catch (Exception e) {
@@ -259,6 +263,9 @@ public class UserServiceImpl implements UserService {
                     user.getLastName(), user.getEmail(), user.getCostCenterId(),
                     user.getBusinessUnitId(), "./image8.jpg", user.getRole(),
                     user.isTrainer(), user.getId());
+
+            deleteUserLicense(user.getId(), jdbcTemplate);
+            insertUserLicenses(user.getId(), user.getLicenseList(), jdbcTemplate);
 
             ResponseEntity<Object> response = new ResponseEntity<>("Updated", HttpStatus.CREATED);
             return response;
@@ -366,6 +373,7 @@ public class UserServiceImpl implements UserService {
                 user.setCostCenterName((String) row.get("cost_center"));
                 user.setUrl((String) row.get("image_url"));
                 user.setRole((String) row.get("role"));
+                user.setLicenseList(getUserLicenses(user.getId(), jdbcTemplate));
                 user.setTrainer((boolean) row.get("is_trainer"));
 
                 users.add(user);
@@ -374,5 +382,47 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             return new ArrayList<>();
         }
+    }
+
+    public List<License> getUserLicenses(Long userId, JdbcTemplate jdbcTemplate) {
+        String query = "SELECT ul.*, " +
+                "       l.NAME, " +
+                "       l.description " +
+                "FROM   "+ Constants.TABLE_USER_LICENSE+" AS ul " +
+                "       INNER JOIN "+Constants.TABLE_LICENSE+" AS l " +
+                "               ON ul.license_id = l.id " +
+                "WHERE  ul.user_id = ?";
+
+        List<License> licenses = new ArrayList<>();
+
+        try {
+            List<Map<String, Object>> userRows = jdbcTemplate.queryForList(query, userId);
+            for (Map<String, Object> row : userRows) {
+                License temp = new License();
+
+                temp.setId((Long) row.get("license_id"));
+                temp.setName((String) row.get("name"));
+                temp.setDescription((String) row.get("description"));
+
+                licenses.add(temp);
+            }
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return licenses;
+    }
+
+    void insertUserLicenses(Long userId, List<License> licenses, JdbcTemplate jdbcTemplate) {
+        String query = "INSERT INTO " + Constants.TABLE_USER_LICENSE + " VALUES (?,?)";
+
+        for (License license: licenses) {
+            jdbcTemplate.update(query, userId, license.getId());
+        }
+    }
+
+    void deleteUserLicense(Long userId, JdbcTemplate jdbcTemplate) {
+        String query = "DELETE FROM " + Constants.TABLE_USER_LICENSE +
+                " WHERE  user_id = ? ";
+        jdbcTemplate.update(query, userId);
     }
 }

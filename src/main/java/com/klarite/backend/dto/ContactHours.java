@@ -7,7 +7,7 @@ public class ContactHours {
     private String position;
     private Integer ceHrs;
     private Integer timePeriod;
-    private Integer certificationId;
+    private Long licenseId;
 
     public Long getId() {
         return id;
@@ -57,11 +57,11 @@ public class ContactHours {
         this.timePeriod = timePeriod;
     }
 
-    public Integer getCertificationId() {
-        return certificationId;
+    public Long getLicenseId() {
+        return licenseId;
     }
 
-    public void setCertificationId(Integer certificationId) {
-        this.certificationId = certificationId;
+    public void setLicenseId(Long licenseId) {
+        this.licenseId = licenseId;
     }
 }

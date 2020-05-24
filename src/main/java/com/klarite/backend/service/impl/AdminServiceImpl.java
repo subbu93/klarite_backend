@@ -1,10 +1,7 @@
 package com.klarite.backend.service.impl;
 
 import com.klarite.backend.Constants;
-import com.klarite.backend.dto.ContactHours;
-import com.klarite.backend.dto.Skill;
-import com.klarite.backend.dto.Training;
-import com.klarite.backend.dto.User;
+import com.klarite.backend.dto.*;
 import com.klarite.backend.service.AdminService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -270,15 +267,13 @@ public class AdminServiceImpl implements AdminService {
         String query = "";
         if (ce.getId() == null) {
             query = "INSERT INTO " + Constants.TABLE_CONTINUED_EDUCATION +
-                    " (state, title, position, ce_hours, time_period) " +
+                    " (state, ce_hours, time_period, license_id) " +
                     " VALUES      (?," +
                     "             ?, " +
                     "             ?," +
-                    "             ?," +
                     "             ?); ";
             try {
-                jdbcTemplate.update(query, ce.getState(), ce.getUserTitle(), ce.getPosition(),
-                        ce.getCeHrs(), ce.getTimePeriod());
+                jdbcTemplate.update(query, ce.getState(), ce.getCeHrs(), ce.getTimePeriod(), ce.getLicenseId());
                 ResponseEntity<Object> response = new ResponseEntity<>("Stored", HttpStatus.CREATED);
                 return response;
             } catch (Exception e) {
@@ -286,11 +281,11 @@ public class AdminServiceImpl implements AdminService {
             }
         } else {
             query = "UPDATE " + Constants.TABLE_CONTINUED_EDUCATION +
-                    " SET state = ?, title = ?, position = ?, ce_hours = ?, time_period = ? " +
+                    " SET state = ?, ce_hours = ?, time_period = ?, license_id = ? " +
                     " WHERE id = ?;";
             try {
-                jdbcTemplate.update(query, ce.getState(), ce.getUserTitle(), ce.getPosition(),
-                        ce.getCeHrs(), ce.getTimePeriod(), ce.getId());
+                jdbcTemplate.update(query, ce.getState(), ce.getCeHrs(), ce.getTimePeriod(),
+                        ce.getLicenseId(), ce.getId());
                 ResponseEntity<Object> response = new ResponseEntity<>("Stored", HttpStatus.CREATED);
                 return response;
             } catch (Exception e) {
@@ -300,29 +295,49 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public ContactHours getCeHrs(String state, Integer certificationId, JdbcTemplate jdbcTemplate) {
+    public ContactHours getCeHrs(String state, Integer licenseId, JdbcTemplate jdbcTemplate) {
         ContactHours ce = new ContactHours();
-        if (state == null || certificationId == null ) {
+        if (state == null || licenseId == null ) {
             return null;
         }
         String query = "SELECT * FROM " + Constants.TABLE_CONTINUED_EDUCATION +
                 "       WHERE state = ?" +
-                "       AND certification_id = ?";
+                "       AND license_id = ?";
         try {
-            Map<String, Object> row = jdbcTemplate.queryForMap(query, state, certificationId);
+            Map<String, Object> row = jdbcTemplate.queryForMap(query, state, licenseId);
 
             ce.setId((Long) row.get("id"));
-            ce.setPosition((String) row.get("position"));
             ce.setState((String) row.get("state"));
-            ce.setUserTitle((String) row.get("title"));
             ce.setCeHrs((Integer) row.get("ce_hours"));
             ce.setTimePeriod((Integer) row.get("time_period"));
-            ce.setCertificationId((Integer) row.get("certification_id"));
+            ce.setLicenseId((Long) row.get("license_id"));
         } catch (Exception e) {
             System.out.println(e);
             return null;
         }
 
         return ce;
+    }
+
+    @Override
+    public List<License> getLicenses(JdbcTemplate jdbcTemplate) {
+        String query = "SELECT * FROM " + Constants.TABLE_LICENSE;
+        List<License> licenses = new ArrayList<>();
+
+        try {
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
+
+            for (Map<String, Object> row: rows) {
+                License license = new License();
+                license.setId((Long) row.get("id"));
+                license.setName((String) row.get("name"));
+                license.setDescription((String) row.get("description"));
+
+                licenses.add(license);
+            }
+            return licenses;
+        } catch (Exception e) {
+            return licenses;
+        }
     }
 }

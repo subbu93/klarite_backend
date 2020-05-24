@@ -1,9 +1,6 @@
 package com.klarite.backend.service;
 
-import com.klarite.backend.dto.ContactHours;
-import com.klarite.backend.dto.Skill;
-import com.klarite.backend.dto.Training;
-import com.klarite.backend.dto.User;
+import com.klarite.backend.dto.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -32,5 +29,7 @@ public interface AdminService {
 
     ResponseEntity<Object> addContactHours(ContactHours ce, JdbcTemplate jdbcTemplate);
 
-    ContactHours getCeHrs(String state, Integer certificationId, JdbcTemplate jdbcTemplate);
+    ContactHours getCeHrs(String state, Integer licenseId, JdbcTemplate jdbcTemplate);
+
+    List<License> getLicenses(JdbcTemplate jdbcTemplate);
 }
