@@ -7,6 +7,7 @@ public class Skill {
     private Integer totalThreshold;
     private String skillTrainingPreRequisite;
     private Integer episodeCount;
+    private Integer validatedEpisodeCount;
     private Long trainingId;
     private Integer validationThreshold;
 
@@ -74,5 +75,13 @@ public class Skill {
 
     public void setValidationThreshold(Integer validationThreshold) {
         this.validationThreshold = validationThreshold;
+    }
+
+    public Integer getValidatedEpisodeCount() {
+        return validatedEpisodeCount;
+    }
+
+    public void setValidatedEpisodeCount(Integer validatedEpisodeCount) {
+        this.validatedEpisodeCount = validatedEpisodeCount;
     }
 }

@@ -179,6 +179,7 @@ public class SkillServiceImpl implements SkillService {
                 skill.setSkillTrainingPreRequisite((String) row.get("training_prerequisite"));
                 skill.setTrainingId((Long) row.get("training_id"));
                 skill.setEpisodeCount(getEpisodeCount(skill.getId(), userId, jdbcTemplate));
+                skill.setValidatedEpisodeCount(getValidatedEpisodeCount(skill.getId(), userId, jdbcTemplate));
                 skills.add(skill);
             }
             return skills;
@@ -379,6 +380,17 @@ public class SkillServiceImpl implements SkillService {
         String query = "SELECT Count(*) AS count " +
                 "FROM  " + Constants.TABLE_SKILL_EPISODES +
                 " WHERE  skill_id = ? " +
+                "       AND episode_id IN (SELECT id " +
+                "                          FROM   episodes " +
+                "                          WHERE  user_id = ?); ";
+        Map<String, Object> row = jdbcTemplate.queryForMap(query, skillId, userId);
+        return (Integer) row.get("count");
+    }
+
+    private Integer getValidatedEpisodeCount(Long skillId, Long userId, JdbcTemplate jdbcTemplate) {
+        String query = "SELECT Count(*) AS count " +
+                "FROM  " + Constants.TABLE_SKILL_EPISODES +
+                " WHERE  skill_id = ? " +
                 "       AND is_validated = 1" +
                 "       AND episode_id IN (SELECT id " +
                 "                          FROM   episodes " +
@@ -436,6 +448,9 @@ public class SkillServiceImpl implements SkillService {
                     skillEpisode.setSkillId((Long) new_row.get("skill_id"));
                     skillEpisode.setObserved((boolean) new_row.get("is_observed"));
                     skillEpisode.setObserverId((Long) new_row.get("observer_id"));
+                    skillEpisode.setComment((String) new_row.get("comment"));
+                    skillEpisode.setValidated((Boolean) new_row.get("is_validated"));
+                    skillEpisode.setRemediated((Boolean) new_row.get("is_remediated"));
                     skillEpisode.setSkillName(adminService.getSkill(skillEpisode.getSkillId(), jdbcTemplate).getSkillName());
                     obj.getEpisodes().add(skillEpisode);
                 }

@@ -4,7 +4,10 @@ public class SkillEpisode {
     private Long skillId;
     private boolean isObserved;
     private Long observerId = null;
-    private String skillName; 
+    private String skillName;
+    private boolean isValidated;
+    private boolean isRemediated;
+    private String comment;
     
     public long getSkillId() {
         return skillId;
@@ -36,5 +39,29 @@ public class SkillEpisode {
 
     public void setSkillName(String skillName) {
         this.skillName = skillName;
+    }
+
+    public boolean isValidated() {
+        return isValidated;
+    }
+
+    public void setValidated(boolean isValidated) {
+        this.isValidated = isValidated;
+    }
+
+    public boolean isRemediated() {
+        return isRemediated;
+    }
+
+    public void setRemediated(boolean isRemediated) {
+        this.isRemediated = isRemediated;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }
