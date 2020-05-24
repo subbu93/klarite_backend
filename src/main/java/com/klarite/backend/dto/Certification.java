@@ -1,10 +1,13 @@
 package com.klarite.backend.dto;
 
+import java.time.LocalDate;
+
 public class Certification {
     private Integer id;
     private String name;
     private String description;
-
+    private LocalDate expiry;
+    
     public Integer getId() {
         return id;
     }
@@ -27,5 +30,13 @@ public class Certification {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public LocalDate getExpiry() {
+        return expiry;
+    }
+
+    public void setExpiry(LocalDate expiry) {
+        this.expiry = expiry;
     }
 }

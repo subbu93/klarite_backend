@@ -1,5 +1,6 @@
 package com.klarite.backend.controller;
 
+import com.klarite.backend.dto.Certification;
 import com.klarite.backend.dto.Episode;
 import com.klarite.backend.dto.ProfileImage;
 import com.klarite.backend.dto.User;
@@ -81,6 +82,17 @@ public class UserController {
                                              @RequestParam(value = "newPswd") String newPswd) {
         if (authenticationService.isTokenValid(token, jdbcTemplate)) {
             return userService.changePswd(userId, oldPswd, newPswd, jdbcTemplate);
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @PostMapping("/user_services/update_certification")
+    public ResponseEntity<Object> updateCertification(@RequestHeader(value = "token") String token,
+                                                      @RequestHeader(value = "userId") Long userId,
+                                                      @RequestBody List<Certification> certifications) {
+        if (authenticationService.isTokenValid(token, jdbcTemplate)) {
+            return userService.updateCertification(userId, certifications, jdbcTemplate);
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }

@@ -295,7 +295,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public ContactHours getCeHrs(String state, Integer licenseId, JdbcTemplate jdbcTemplate) {
+    public ContactHours getCeHrs(String state, Long licenseId, JdbcTemplate jdbcTemplate) {
         ContactHours ce = new ContactHours();
         if (state == null || licenseId == null ) {
             return null;

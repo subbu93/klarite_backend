@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
-import java.util.Map;
 
 public interface ContactHourService {
     ContinuedEducationEvents getAll(Long userId, JdbcTemplate jdbcTemplate);

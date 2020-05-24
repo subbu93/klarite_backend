@@ -2,9 +2,12 @@ package com.klarite.backend.service.impl;
 
 import com.klarite.backend.Constants;
 import com.klarite.backend.dto.*;
+import com.klarite.backend.service.AdminService;
 import com.klarite.backend.service.ContactHourService;
+import com.klarite.backend.service.UserService;
 
 import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,17 +18,22 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 @Service
 public class ContactHourServiceImpl implements ContactHourService {
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private AdminService adminService;
 
     @Override
     public ContinuedEducationEvents getAll(Long userId, JdbcTemplate jdbcTemplate) {
         ContinuedEducationEvents ce = new ContinuedEducationEvents();
-        ce.setCeHrsPerYear(100); // todo:ishan- fix this value
+        ce.setCeHrsPerYear(getThreshold(userId, jdbcTemplate));
         ce.setTrainings(getTrainingsWithCE(userId, jdbcTemplate));
         ce.setEducation(getEducation(userId, jdbcTemplate));
         return ce;
@@ -40,7 +48,9 @@ public class ContactHourServiceImpl implements ContactHourService {
         obj.setId((Long) row.get("id"));
         obj.setUserId((Long) row.get("user_id"));
         obj.setName((String) row.get("name"));
-        obj.setDate((Date) row.get("date"));
+        java.sql.Date date = (java.sql.Date) row.get("date");
+        if (date != null)
+            obj.setDate(date.toLocalDate());
         obj.setCE((Boolean) row.get("is_ce"));
         obj.setPresenterName((String) row.get("presenter"));
         obj.setTotalHours((Float) row.get("total_hours"));
@@ -96,7 +106,7 @@ public class ContactHourServiceImpl implements ContactHourService {
 
     @Override
     public List<Certification> getAllCertifications(JdbcTemplate jdbcTemplate) {
-        String certificationQuery = "SELECT * FROM " + Constants.CERTIFICATIONS;
+        String certificationQuery = "SELECT * FROM " + Constants.TABLE_CERTIFICATIONS;
         List<Certification> certifications = new ArrayList<>();
         try {
             List<Map<String, Object>> rows = jdbcTemplate.queryForList(certificationQuery);
@@ -181,7 +191,9 @@ public class ContactHourServiceImpl implements ContactHourService {
             obj.setId((Long) row.get("id"));
             obj.setUserId((Long) row.get("user_id"));
             obj.setName((String) row.get("name"));
-            obj.setDate((Date) row.get("date"));
+            java.sql.Date date = (java.sql.Date) row.get("date");
+            if (date != null)
+                obj.setDate(date.toLocalDate());
             obj.setCE((Boolean) row.get("is_ce"));
             obj.setPresenterName((String) row.get("presenter"));
             obj.setTotalHours((Float) row.get("total_hours"));
@@ -208,5 +220,17 @@ public class ContactHourServiceImpl implements ContactHourService {
     private String getTempFileName() {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         return timestamp.getTime() + ".jpg";
+    }
+
+    private Integer getThreshold(Long userId, JdbcTemplate jdbcTemplate) {
+        User usr = userService.getUser(userId, false, jdbcTemplate);
+        if (usr.getLicenseList().size() > 0) {
+            ContactHours contactHours = adminService.getCeHrs("Ohio", usr.getLicenseList().get(0).getId(), jdbcTemplate);
+            if (contactHours == null)
+                return 0;
+            else
+                return contactHours.getCeHrs();
+        } else 
+            return 0;
     }
 }
