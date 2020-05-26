@@ -311,7 +311,7 @@ public class UserServiceImpl implements UserService {
                 orn.addSkillId(skillEpisode.getSkillId());
             }
         }
-        if (orn.getSkills().size() > 0) {
+        if (orn.getSkills() != null && orn.getSkills().size() > 0) {
             notificationService.add(orn, usr, null, jdbcTemplate);
         }
     }
