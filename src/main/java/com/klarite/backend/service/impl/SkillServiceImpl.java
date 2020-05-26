@@ -254,7 +254,7 @@ public class SkillServiceImpl implements SkillService {
                 "       users.last_name " +
                 "FROM   (SELECT t1.*, " +
                 "               skills.name, " +
-                "               skills.total_threshold " +
+                "               skills.total_threshold, " +
                 "               skills.validation_threshold " +
                 "        FROM   (SELECT * " +
                 "                FROM " + Constants.TABLE_SKILL_EPISODES + " se " +

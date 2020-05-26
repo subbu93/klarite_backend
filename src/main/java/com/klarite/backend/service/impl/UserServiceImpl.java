@@ -301,9 +301,11 @@ public class UserServiceImpl implements UserService {
         User usr = getUser(userId, jdbcTemplate);
         for (SkillEpisode skillEpisode : skillEpisodeList) {
             if (!skillEpisode.isObserved() || skillEpisode.getObserverId() == 0)
-                jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(), skillEpisode.isObserved(), null, 0, 0, null);
+                jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(),
+                        skillEpisode.isObserved(), null, 0, 0, null);
             else
-                jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(), skillEpisode.isObserved(), skillEpisode.getObserverId(), 0, 0, null);
+                jdbcTemplate.update(query, episodeId, skillEpisode.getSkillId(),
+                        skillEpisode.isObserved(), skillEpisode.getObserverId(), 0, 0, null);
             
             if (skillEpisode.isObserved()) {
                 orn.addSkillId(skillEpisode.getSkillId());
