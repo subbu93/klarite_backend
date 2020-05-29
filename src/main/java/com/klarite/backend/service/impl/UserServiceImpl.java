@@ -53,12 +53,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<Object> updateSkillEpisode(Episode episode, JdbcTemplate jdbcTemplate) {
         try {
-            String query = "UPDATE" + Constants.TABLE_EPISODES +
-                    "SET date = ?, mrn = ?, is_audited = ? WHERE id = ?;";
-            jdbcTemplate.update(query, episode.getDate(), episode.getMrn(),
-                    episode.isAudited(), episode.getId());
-            insertSkillEpisodes(episode.getUserId(), episode.getId().longValue(),
-                    episode.getEpisodes(), jdbcTemplate);
+            String query = "UPDATE" + Constants.TABLE_EPISODES + "SET date = ?, mrn = ? WHERE id = ?;";
+            jdbcTemplate.update(query, episode.getDate(), episode.getMrn(), episode.getId());
+            insertSkillEpisodes(episode.getUserId(), episode.getId().longValue(), episode.getEpisodes(), jdbcTemplate);
             return new ResponseEntity<>("Updated", HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
