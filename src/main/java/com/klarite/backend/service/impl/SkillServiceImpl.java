@@ -283,7 +283,7 @@ public class SkillServiceImpl implements SkillService {
                 temp.setMrn((String) row.get("mrn"));
                 temp.setFirstName((String) row.get("first_name"));
                 temp.setLastName((String) row.get("last_name"));
-                temp.setDate((Date) row.get("date"));
+                temp.setDate(((Timestamp) row.get("date")).toString());
                 temp.setValidated((boolean) row.get("is_validated"));
                 temp.setObserved((boolean) row.get("is_observed"));
                 temp.setRemediated((boolean) row.get("is_remediated"));

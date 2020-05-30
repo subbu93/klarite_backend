@@ -7,7 +7,7 @@ public class ValidationData {
     private Long skillId;
     private Long userId;
     private Long observerId;
-    private Date date;
+    private String date;
     private boolean isValidated;
     private boolean isObserved;
     private String comment;
@@ -49,11 +49,11 @@ public class ValidationData {
         this.observerId = observerId;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
