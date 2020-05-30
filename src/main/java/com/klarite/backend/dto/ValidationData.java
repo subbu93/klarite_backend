@@ -1,7 +1,5 @@
 package com.klarite.backend.dto;
 
-import java.util.Date;
-
 public class ValidationData {
     private Long episodeId;
     private Long skillId;

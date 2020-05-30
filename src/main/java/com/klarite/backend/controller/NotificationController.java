@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.klarite.backend.Constants;
+import com.klarite.backend.dto.ReadNotification;
 import com.klarite.backend.dto.Notification.Notification;
 import com.klarite.backend.service.AuthenticationService;
 import com.klarite.backend.service.NotificationService;
@@ -53,6 +54,16 @@ public class NotificationController {
                                          @RequestParam(value = "id") Long id) {
         if (authenticationService.isTokenValid(token, jdbcTemplate)) {
             return notificationService.delete(id, jdbcTemplate);
+        } else {
+            return new ResponseEntity<>(Constants.MSG_UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @PostMapping("/notification/mark-read")
+    public ResponseEntity<Object> markRead(@RequestHeader(value = "token") String token,
+                                          @RequestBody ReadNotification notificationIds) {
+        if (authenticationService.isTokenValid(token, jdbcTemplate)) {
+            return notificationService.markRead(notificationIds, jdbcTemplate);
         } else {
             return new ResponseEntity<>(Constants.MSG_UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
         }

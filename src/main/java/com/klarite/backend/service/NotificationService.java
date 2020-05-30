@@ -1,5 +1,6 @@
 package com.klarite.backend.service;
 
+import com.klarite.backend.dto.ReadNotification;
 import com.klarite.backend.dto.User;
 import com.klarite.backend.dto.Notification.Notification;
 
@@ -13,4 +14,5 @@ public interface NotificationService {
     ResponseEntity<Object> add(Notification notification, User usr, Long receiverId, JdbcTemplate jdbcTemplate) throws DataAccessException;
     ResponseEntity<Object> delete(Long id, JdbcTemplate jdbcTemplate);
     ResponseEntity<Object> respond(Long id, Long userId, Boolean accepted, String comment, JdbcTemplate jdbcTemplate);
+    ResponseEntity<Object> markRead(ReadNotification ids, JdbcTemplate jdbcTemplate);
 }
