@@ -1,15 +1,13 @@
 package com.klarite.backend.dto;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class Episode {
     private long id;
     private long userId;
-    private Date date;
+    private String date;
     private String mrn;
-    private boolean isAudited;
     private List<SkillEpisode> episodes = new ArrayList<>();
 
     public Long getId() {
@@ -28,11 +26,11 @@ public class Episode {
         this.userId = userId;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
@@ -42,14 +40,6 @@ public class Episode {
 
     public void setMrn(String mrn) {
         this.mrn = mrn;
-    }
-
-    public boolean isAudited() {
-        return isAudited;
-    }
-
-    public void setAudited(boolean isAudited) {
-        this.isAudited = isAudited;
     }
 
     public List<SkillEpisode> getEpisodes() {

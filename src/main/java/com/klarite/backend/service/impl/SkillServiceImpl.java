@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -441,7 +442,7 @@ public class SkillServiceImpl implements SkillService {
                 Episode obj = new Episode();
                 obj.setId(episode_id);
                 obj.setUserId((Long) row.get("user_id"));
-                obj.setDate((Date) row.get("date"));
+                obj.setDate(((Timestamp) row.get("date")).toString());
                 obj.setMrn((String) row.get("mrn"));
                 for (Map<String, Object> new_row : new_rows) {
                     SkillEpisode skillEpisode = new SkillEpisode();
