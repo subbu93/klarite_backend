@@ -183,6 +183,9 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public ResponseEntity<Object> add(Notification notification, User usr, Long receiverId, 
             JdbcTemplate jdbcTemplate) throws DataAccessException {
+        if (checkIfAlreadyPresent(notification, usr.getCostCenterId(), usr.getBusinessUnitId(), usr.getId(), jdbcTemplate)) {
+            return new ResponseEntity<>(Constants.MSG_UPDATED_SUCCESSFULLY, HttpStatus.CREATED);
+        }
         String query = "INSERT INTO" + Constants.TABLE_NOTIFICATIONS + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
         java.util.Date date = new java.util.Date();
         String dateStr = (new SimpleDateFormat("yyyy-MM-dd")).format(date);
@@ -191,5 +194,14 @@ public class NotificationServiceImpl implements NotificationService {
             notification.fetchPayload(), notification.getType(), dateStr, timeStr, true);
         
         return new ResponseEntity<>(Constants.MSG_UPDATED_SUCCESSFULLY, HttpStatus.CREATED);
+    }
+
+    private Boolean checkIfAlreadyPresent(Notification notification, Integer integer, Integer integer2, Long senderId,
+                JdbcTemplate jdbcTemplate) {
+        String query = "SELECT id FROM " + Constants.TABLE_NOTIFICATIONS
+                + "WHERE cost_center_id = ? AND business_unit_id = ? AND sender_id = ? AND payload = ? AND type = ?";
+        return jdbcTemplate
+                .queryForList(query, integer, integer2, senderId, notification.fetchPayload(), notification.getType())
+                .size() > 0;
     }
 }
