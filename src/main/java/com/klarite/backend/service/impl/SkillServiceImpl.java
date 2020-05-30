@@ -6,7 +6,6 @@ import com.klarite.backend.dto.Notification.SkillValidationNotification;
 import com.klarite.backend.service.AdminService;
 import com.klarite.backend.service.NotificationService;
 import com.klarite.backend.service.SkillService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +14,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.sql.Date;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -283,7 +280,7 @@ public class SkillServiceImpl implements SkillService {
                 temp.setMrn((String) row.get("mrn"));
                 temp.setFirstName((String) row.get("first_name"));
                 temp.setLastName((String) row.get("last_name"));
-                temp.setDate(((Timestamp) row.get("date")).toString());
+                temp.setDate((row.get("date")).toString());
                 temp.setValidated((boolean) row.get("is_validated"));
                 temp.setObserved((boolean) row.get("is_observed"));
                 temp.setRemediated((boolean) row.get("is_remediated"));
@@ -442,7 +439,7 @@ public class SkillServiceImpl implements SkillService {
                 Episode obj = new Episode();
                 obj.setId(episode_id);
                 obj.setUserId((Long) row.get("user_id"));
-                obj.setDate(((Timestamp) row.get("date")).toString());
+                obj.setDate((row.get("date")).toString());
                 obj.setMrn((String) row.get("mrn"));
                 for (Map<String, Object> new_row : new_rows) {
                     SkillEpisode skillEpisode = new SkillEpisode();
