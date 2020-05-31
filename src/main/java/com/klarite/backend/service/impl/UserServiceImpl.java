@@ -69,9 +69,9 @@ public class UserServiceImpl implements UserService {
             if (trainingAssignmentId != null) {
                 if (isTimeValid(trainingAssignmentId, jdbcTemplate)) {
                     String query = "UPDATE " + Constants.TABLE_TRAINING_ASSIGNMENTS +
-                            " SET attended = 1 WHERE uuid = ? and user_id = ?";
+                            " SET attended = 1 WHERE assignment_id = ? and user_id = ?";
                     jdbcTemplate.update(query, trainingAssignmentId, userId);
-                    return new ResponseEntity<>(Constants.MSG_MARK_ATTENDANCE_SUCCESS, HttpStatus.OK);
+                    return new ResponseEntity<>(Constants.MSG_MARK_ATTENDANCE_SUCCESS, HttpStatus.CREATED);
                 } else
                     return new ResponseEntity<>(Constants.MSG_MARK_ATTENDANCE_INVALID_TIME, HttpStatus.BAD_REQUEST);
             } else
@@ -325,9 +325,9 @@ public class UserServiceImpl implements UserService {
     }
 
     private boolean isTimeValid(Long trainingAssignmentId, JdbcTemplate jdbcTemplate) {
-        String query = "SELECT uuid FROM " + Constants.TABLE_T_ASSIGNMENTS + " WHERE  id = ?)";
+        String query = "SELECT * FROM " + Constants.TABLE_T_ASSIGNMENTS + " WHERE  id = ?";
         Map<String, Object> row = jdbcTemplate.queryForMap(query, trainingAssignmentId);
-        boolean isDateValid = ((Date) row.get("date")).equals(new Date(System.currentTimeMillis()));
+        boolean isDateValid = (row.get("date").toString()).equals((new Date(System.currentTimeMillis())).toString());
         boolean isTimeValid = true;    //todo ishan: fix this
         return isDateValid && isTimeValid;
     }
