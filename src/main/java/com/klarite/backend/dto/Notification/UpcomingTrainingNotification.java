@@ -18,7 +18,7 @@ public class UpcomingTrainingNotification extends Notification {
 
     @Override
     public int getType() {
-        return NotificationType.SkillValidation;
+        return NotificationType.UpcomingTraining;
     }
 
     @Override
