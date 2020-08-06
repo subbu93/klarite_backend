@@ -40,7 +40,7 @@ public class SkillServiceImpl implements SkillService {
         String businessUnitIdQuery = "SELECT business_unit.* " +
                 "FROM   " + Constants.TABLE_USERS + " AS u " +
                 "       INNER JOIN " + Constants.TABLE_BUSINESS_UNIT +
-                "               ON u.cost_center_id = business_unit.id " +
+                "               ON u.business_unit_id = business_unit.id " +
                 "WHERE  u.id = ?" +
                 "       AND u.soft_delete = 0;";
 
